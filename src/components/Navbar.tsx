@@ -33,7 +33,10 @@ export function Navbar() {
             <img 
               src={logo} 
               alt="AIZboostr" 
-              className="h-14 w-auto mix-blend-multiply" 
+              className="h-20 w-auto mix-blend-multiply transition-transform duration-300 hover:scale-105" 
+              style={{
+                filter: 'drop-shadow(2px 2px 0px hsl(var(--muted))) drop-shadow(4px 4px 0px hsl(var(--border))) drop-shadow(6px 6px 10px hsl(var(--foreground) / 0.15))'
+              }}
             />
           </Link>
 
