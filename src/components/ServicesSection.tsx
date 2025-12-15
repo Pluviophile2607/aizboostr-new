@@ -81,13 +81,15 @@ export function ServicesSection() {
                 Start Your AI Journey
               </button>
             </div>
-            <div className="relative h-64 lg:h-full">
+            <div className="relative h-64 lg:h-full flex flex-col items-center justify-center">
+              <p className="text-2xl lg:text-3xl font-bold text-foreground text-center mb-4 z-10">
+                "JO DIKHTA HAI WOH BIKTA HAI"
+              </p>
               <img 
                 src={zedCharacter} 
                 alt="ZED" 
-                className="absolute bottom-0 right-0 h-full w-auto object-contain object-bottom animate-float drop-shadow-[0_0_30px_hsl(var(--primary)/0.3)]"
+                className="h-48 lg:h-64 w-auto object-contain animate-float mix-blend-multiply"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-card to-transparent" />
             </div>
           </div>
         </div>
