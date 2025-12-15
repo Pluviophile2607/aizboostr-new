@@ -81,10 +81,20 @@ export function ServicesSection() {
                 Start Your AI Journey
               </button>
             </div>
-            <div className="relative h-64 lg:h-full flex flex-col items-center justify-center">
-              <p className="text-2xl lg:text-3xl font-bold text-foreground text-center mb-4 z-10">
-                "JO DIKHTA HAI WOH BIKTA HAI"
-              </p>
+            <div className="relative h-80 lg:h-full flex flex-col items-center justify-center py-8">
+              <div className="text-center mb-6 z-10">
+                <p 
+                  className="text-4xl lg:text-6xl font-black text-foreground leading-tight"
+                  style={{
+                    textShadow: '3px 3px 0px hsl(var(--muted)), 6px 6px 0px hsl(var(--border)), 9px 9px 15px hsl(var(--foreground) / 0.2)'
+                  }}
+                >
+                  <span className="block">"JO</span>
+                  <span className="block">DIKHTA HAI</span>
+                  <span className="block">WOH</span>
+                  <span className="block">BIKTA HAI"</span>
+                </p>
+              </div>
               <img 
                 src={zedCharacter} 
                 alt="ZED" 
