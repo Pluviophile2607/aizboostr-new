@@ -85,7 +85,7 @@ export function ServicesSection() {
               <img 
                 src={zedCharacter} 
                 alt="ZED" 
-                className="absolute bottom-0 right-0 h-full w-auto object-contain object-bottom"
+                className="absolute bottom-0 right-0 h-full w-auto object-contain object-bottom animate-float drop-shadow-[0_0_30px_hsl(var(--primary)/0.3)]"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-card to-transparent" />
             </div>
