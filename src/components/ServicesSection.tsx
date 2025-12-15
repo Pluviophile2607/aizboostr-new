@@ -82,17 +82,19 @@ export function ServicesSection() {
               </button>
             </div>
             <div className="relative h-80 lg:h-full flex flex-col items-center justify-center py-8">
-              <div className="text-center mb-6 z-10">
+              <div className="text-center mb-6 z-10 group cursor-pointer">
                 <p 
-                  className="text-4xl lg:text-6xl font-black text-foreground leading-tight"
+                  className="text-4xl lg:text-6xl font-black text-foreground leading-tight transition-all duration-500 group-hover:scale-105 group-hover:rotate-1"
                   style={{
-                    textShadow: '3px 3px 0px hsl(var(--muted)), 6px 6px 0px hsl(var(--border)), 9px 9px 15px hsl(var(--foreground) / 0.2)'
+                    textShadow: '3px 3px 0px hsl(var(--muted)), 6px 6px 0px hsl(var(--border)), 9px 9px 15px hsl(var(--foreground) / 0.2)',
+                    transformStyle: 'preserve-3d',
+                    perspective: '1000px'
                   }}
                 >
-                  <span className="block">"JO</span>
-                  <span className="block">DIKHTA HAI</span>
-                  <span className="block">WOH</span>
-                  <span className="block">BIKTA HAI"</span>
+                  <span className="block transition-transform duration-300 group-hover:translate-x-1">"JO</span>
+                  <span className="block transition-transform duration-300 delay-75 group-hover:-translate-x-1">DIKHTA HAI</span>
+                  <span className="block transition-transform duration-300 delay-150 group-hover:translate-x-1">WOH</span>
+                  <span className="block transition-transform duration-300 delay-200 group-hover:-translate-x-1">BIKTA HAI"</span>
                 </p>
               </div>
               <img 
