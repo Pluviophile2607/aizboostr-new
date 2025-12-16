@@ -1,28 +1,20 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, User } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Menu, X, Bot, CreditCard, GraduationCap, Server, Sparkles, HeadphonesIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/aiz-logo.jpeg";
 
 const navLinks = [
-  { name: "Services", href: "#services" },
-  { name: "Plans", href: "#plans" },
-  { name: "AI Academy", href: "#academy" },
-  { name: "SaaS", href: "#saas" },
-  { name: "AI Systems", href: "#systems" },
-  { name: "Support", href: "#support" },
+  { name: "Services", href: "/service/ai-automation", icon: Bot },
+  { name: "Plans", href: "/service/brand-building", icon: CreditCard },
+  { name: "AI Academy", href: "/service/ai-academy", icon: GraduationCap },
+  { name: "SaaS", href: "/service/saas-solutions", icon: Server },
+  { name: "AI Systems", href: "/service/ai-systems", icon: Sparkles },
+  { name: "Support", href: "/service/ai-marketing", icon: HeadphonesIcon },
 ];
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-
-  const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-    setIsOpen(false);
-  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/50">
@@ -40,13 +32,14 @@ export function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
-              <button
+              <Link
                 key={link.name}
-                onClick={() => scrollToSection(link.href)}
-                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+                to={link.href}
+                className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
               >
+                <link.icon className="h-4 w-4" />
                 {link.name}
-              </button>
+              </Link>
             ))}
           </div>
 
@@ -79,13 +72,15 @@ export function Navbar() {
         <div className="lg:hidden bg-background/95 backdrop-blur-xl border-b border-border">
           <div className="px-4 py-4 space-y-2">
             {navLinks.map((link) => (
-              <button
+              <Link
                 key={link.name}
-                onClick={() => scrollToSection(link.href)}
-                className="block w-full text-left px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-lg transition-colors"
+                to={link.href}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 w-full px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-lg transition-colors"
               >
+                <link.icon className="h-5 w-5" />
                 {link.name}
-              </button>
+              </Link>
             ))}
             <div className="pt-4 flex flex-col gap-2">
               <Link to="/auth" onClick={() => setIsOpen(false)}>
