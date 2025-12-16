@@ -43,39 +43,43 @@ const services = [
 
 export function ServicesSection() {
   return (
-    <section id="services" className="py-32 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
+    <section id="services" className="pt-8 pb-32 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/30 to-background" />
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Horizontal scrolling cards at top */}
+        <nav className="mb-16">
+          <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+            {services.map((service, index) => (
+              <Link
+                to={`/service/${service.slug}`}
+                key={service.title}
+                className="group flex-shrink-0 w-72 snap-center"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <article className="bg-card border border-border rounded-2xl p-6 h-full transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/30">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
+                    <service.icon className="h-6 w-6 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2 text-card-foreground">{service.title}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2">{service.description}</p>
+                  <div className="flex items-center gap-1.5 text-primary text-sm font-medium mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    Explore <ArrowRight className="h-4 w-4" />
+                  </div>
+                </article>
+              </Link>
+            ))}
+          </div>
+        </nav>
+
         <div className="text-center mb-16 space-y-4">
-          <h2 className="text-4xl sm:text-5xl font-bold">
+          <h2 className="text-4xl sm:text-5xl font-bold text-foreground">
             Everything You Need to
             <span className="block text-primary glow-text">Dominate with AI</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Comprehensive AI solutions for every aspect of your business growth.
           </p>
-        </div>
-
-        {/* Horizontal scrolling cards */}
-        <div className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory scrollbar-hide -mx-4 px-4">
-          {services.map((service, index) => (
-            <Link
-              to={`/service/${service.slug}`}
-              key={service.title}
-              className="group glass-card p-8 rounded-2xl hover:border-primary/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105 flex-shrink-0 w-80 snap-center cursor-pointer animate-scale-in"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                <service.icon className="h-7 w-7 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">{service.title}</h3>
-              <p className="text-muted-foreground mb-4">{service.description}</p>
-              <div className="flex items-center gap-2 text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                Learn More <ArrowRight className="h-4 w-4" />
-              </div>
-            </Link>
-          ))}
         </div>
 
         {/* ZED CTA */}
