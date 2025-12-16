@@ -64,7 +64,7 @@ export function SystemsSection() {
           <div className="grid lg:grid-cols-2 items-center">
             <div className="relative h-80 lg:h-full">
               <img alt="ZED with AI Systems" className="absolute inset-0 w-full h-full object-cover" src="/lovable-uploads/4faa0a4b-5f45-44ff-aba5-2d97d0eede2e.jpg" />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent to-card lg:from-transparent lg:to-card" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent to-card lg:from-transparent lg:to-card border" />
             </div>
             <div className="p-8 lg:p-12 space-y-6">
               <h3 className="text-3xl font-bold">
