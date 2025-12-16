@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import logo from "@/assets/aizboostr-logo.png";
+import zedHero from "@/assets/zed-hero-banner.png";
 
 export function LogoAnimation() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -30,42 +30,57 @@ export function LogoAnimation() {
       <div className="max-w-4xl mx-auto px-4 text-center">
         <div className="mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Powered by Innovation
+            ZED in Action
           </h2>
           <p className="text-muted-foreground">
-            The AI-driven future of brand building starts here.
+            Your AI-powered brand ambassador doing what he does best!
           </p>
         </div>
 
-        {/* Animated Logo */}
+        {/* ZED Stunt Animation */}
         <div className="relative inline-block">
-          {/* Glow rings */}
+          {/* Energy burst rings */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-80 h-80 rounded-full border border-primary/20 animate-ping opacity-20" style={{ animationDuration: '3s' }} />
+            <div className="w-80 h-80 rounded-full border-2 border-primary/30 animate-ping opacity-20" style={{ animationDuration: '2s' }} />
           </div>
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-96 h-96 rounded-full border border-primary/10 animate-ping opacity-10" style={{ animationDuration: '4s' }} />
+            <div className="w-96 h-96 rounded-full border border-primary/20 animate-ping opacity-10" style={{ animationDuration: '3s' }} />
           </div>
           
-          {/* Logo */}
+          {/* ZED doing backflip */}
           <div className="relative">
             <img 
-              src={logo} 
-              alt="AIZboostr Logo" 
-              className="w-64 h-64 object-contain mx-auto animate-logo-spin animate-pulse-glow"
+              src={zedHero} 
+              alt="ZED doing stunts" 
+              className="w-64 h-64 object-contain mx-auto animate-zed-flip"
               style={{
                 filter: 'drop-shadow(0 0 30px hsl(var(--primary) / 0.5))'
               }}
             />
           </div>
 
-          {/* Orbiting particles */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-72 h-72 relative animate-spin" style={{ animationDuration: '20s' }}>
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3 h-3 bg-primary rounded-full" />
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-primary/70 rounded-full" />
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 bg-primary/50 rounded-full" />
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-primary/80 rounded-full" />
+          {/* Action sparkles */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-80 h-80 relative">
+              {/* Sparkle particles */}
+              <div className="absolute top-4 left-1/4 w-2 h-2 bg-primary rounded-full animate-sparkle" style={{ animationDelay: '0s' }} />
+              <div className="absolute top-8 right-1/4 w-3 h-3 bg-primary/80 rounded-full animate-sparkle" style={{ animationDelay: '0.3s' }} />
+              <div className="absolute bottom-8 left-1/3 w-2 h-2 bg-primary/60 rounded-full animate-sparkle" style={{ animationDelay: '0.6s' }} />
+              <div className="absolute bottom-4 right-1/3 w-2 h-2 bg-primary rounded-full animate-sparkle" style={{ animationDelay: '0.9s' }} />
+              <div className="absolute top-1/3 left-4 w-3 h-3 bg-primary/70 rounded-full animate-sparkle" style={{ animationDelay: '0.2s' }} />
+              <div className="absolute top-1/3 right-4 w-2 h-2 bg-primary/90 rounded-full animate-sparkle" style={{ animationDelay: '0.5s' }} />
+            </div>
+          </div>
+
+          {/* Motion trail effect */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-64 h-64 relative">
+              <div className="absolute inset-0 opacity-20 animate-zed-trail-1">
+                <img src={zedHero} alt="" className="w-full h-full object-contain" />
+              </div>
+              <div className="absolute inset-0 opacity-10 animate-zed-trail-2">
+                <img src={zedHero} alt="" className="w-full h-full object-contain" />
+              </div>
             </div>
           </div>
         </div>
@@ -76,15 +91,15 @@ export function LogoAnimation() {
             AIZboostr
           </h3>
           <p className="text-xl text-muted-foreground">
-            AI Powered Brand Building Brand
+            AI Powered Brand Building
           </p>
         </div>
 
-        {/* Circuit lines decoration */}
+        {/* Energy lines decoration */}
         <div className="absolute inset-0 pointer-events-none opacity-20">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <pattern id="circuit" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+              <pattern id="energy-lines" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
                 <path 
                   d="M0 50 L30 50 L40 40 L60 40 L70 50 L100 50 M50 0 L50 30 L40 40 M50 100 L50 70 L60 60" 
                   fill="none" 
@@ -93,7 +108,7 @@ export function LogoAnimation() {
                 />
               </pattern>
             </defs>
-            <rect width="100%" height="100%" fill="url(#circuit)" />
+            <rect width="100%" height="100%" fill="url(#energy-lines)" />
           </svg>
         </div>
       </div>
