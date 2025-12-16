@@ -1,6 +1,6 @@
 import { Cpu, Workflow, Database, Cloud, Lock, Gauge } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import zedHero from "@/assets/zed-hero-banner.png";
+import zedSaasPose from "@/assets/zed-saas-pose.png";
 
 const features = [
   {
@@ -44,7 +44,7 @@ export function SaaSSection() {
           <div className="relative order-2 lg:order-1">
             <div className="absolute inset-0 bg-gradient-to-l from-primary/20 to-transparent rounded-3xl blur-3xl" />
             <img 
-              src={zedHero} 
+              src={zedSaasPose} 
               alt="ZED with SaaS dashboard" 
               className="relative rounded-3xl shadow-2xl"
             />
