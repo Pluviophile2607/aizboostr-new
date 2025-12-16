@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,10 +8,27 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ServicePage from "./pages/ServicePage";
 import NotFound from "./pages/NotFound";
+import IntroVideo from "./components/IntroVideo";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  const [showIntro, setShowIntro] = useState(true);
+  const [hasPlayedIntro, setHasPlayedIntro] = useState(() => {
+    return sessionStorage.getItem("introPlayed") === "true";
+  });
+
+  const handleIntroComplete = () => {
+    setShowIntro(false);
+    sessionStorage.setItem("introPlayed", "true");
+    setHasPlayedIntro(true);
+  };
+
+  if (showIntro && !hasPlayedIntro) {
+    return <IntroVideo onComplete={handleIntroComplete} />;
+  }
+
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -26,6 +44,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;
