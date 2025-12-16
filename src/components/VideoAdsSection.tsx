@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { Play, Pause, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Video slots with the 3 uploaded videos first
@@ -19,9 +19,12 @@ const videoSlots = [
 export function VideoAdsSection() {
   const [activeVideo, setActiveVideo] = useState<number | null>(null);
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
-  const [isPaused, setIsPaused] = useState(false);
+  const [isHoverPaused, setIsHoverPaused] = useState(false);
+  const [isManualPaused, setIsManualPaused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
+
+  const isPaused = isHoverPaused || isManualPaused;
 
   // Auto-scroll effect
   useEffect(() => {
@@ -66,7 +69,7 @@ export function VideoAdsSection() {
 
   const handleMouseEnter = (slotId: number, hasVideo: boolean) => {
     setHoveredVideo(slotId);
-    setIsPaused(true);
+    setIsHoverPaused(true);
     stopAllVideosExcept(slotId);
     if (hasVideo && videoRefs.current[slotId]) {
       videoRefs.current[slotId]!.play();
@@ -75,7 +78,7 @@ export function VideoAdsSection() {
 
   const handleMouseLeave = (slotId: number, hasVideo: boolean) => {
     setHoveredVideo(null);
-    setIsPaused(false);
+    setIsHoverPaused(false);
     if (hasVideo && videoRefs.current[slotId]) {
       videoRefs.current[slotId]!.pause();
       videoRefs.current[slotId]!.currentTime = 0;
@@ -90,9 +93,27 @@ export function VideoAdsSection() {
             See What's Possible with
             <span className="text-primary glow-text"> AIZboostr</span>
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
             Watch our latest campaigns and success stories powered by AI.
           </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsManualPaused(!isManualPaused)}
+            className="gap-2"
+          >
+            {isManualPaused ? (
+              <>
+                <Play className="h-4 w-4" />
+                Play Carousel
+              </>
+            ) : (
+              <>
+                <Pause className="h-4 w-4" />
+                Pause Carousel
+              </>
+            )}
+          </Button>
         </div>
 
         {/* Scrolling Video Container with Arrows */}
