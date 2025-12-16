@@ -1,6 +1,6 @@
 import { Bot, Megaphone, GraduationCap, Server, Sparkles, Zap, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import zedCharacter from "@/assets/zed-character.png";
+import zedHero from "@/assets/zed-hero-banner.png";
 
 const services = [
   {
@@ -114,7 +114,7 @@ export function ServicesSection() {
                 </p>
               </div>
               <img 
-                src={zedCharacter} 
+                src={zedHero} 
                 alt="ZED" 
                 className="h-48 lg:h-64 w-auto object-contain animate-float mix-blend-multiply"
               />

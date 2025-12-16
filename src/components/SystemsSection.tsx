@@ -1,6 +1,6 @@
 import { Server, Brain, Network, Shield, Cog, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import zedSystems from "@/assets/zed-systems.png";
+import zedHero from "@/assets/zed-hero-banner.png";
 
 const systems = [
   {
@@ -79,7 +79,7 @@ export function SystemsSection() {
           <div className="grid lg:grid-cols-2 items-center">
             <div className="relative h-80 lg:h-full">
               <img 
-                src={zedSystems} 
+                src={zedHero} 
                 alt="ZED with AI Systems" 
                 className="absolute inset-0 w-full h-full object-cover"
               />
