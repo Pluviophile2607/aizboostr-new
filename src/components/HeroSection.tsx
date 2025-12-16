@@ -83,11 +83,19 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* Scroll indicator - Mouse on desktop, finger on mobile */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-pulse">
         <span className="text-xs text-muted-foreground">Scroll to explore</span>
-        <div className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 flex items-start justify-center p-2">
+        {/* Mouse indicator - hidden on mobile */}
+        <div className="hidden sm:flex w-6 h-10 rounded-full border-2 border-muted-foreground/30 items-start justify-center p-2">
           <div className="w-1 h-2 bg-primary rounded-full animate-bounce" />
+        </div>
+        {/* Finger/touch indicator - visible only on mobile */}
+        <div className="flex sm:hidden flex-col items-center">
+          <div className="relative w-8 h-12">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-6 rounded-full bg-muted-foreground/20 border-2 border-muted-foreground/30" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-6 rounded-full bg-primary/30 animate-[swipe_1.5s_ease-in-out_infinite]" />
+          </div>
         </div>
       </div>
     </section>
