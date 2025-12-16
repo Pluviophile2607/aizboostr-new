@@ -14,7 +14,7 @@ export function VideoAdsSection() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <section className="py-20 relative overflow-hidden bg-card/50">
+    <section id="video-ads-section" className="py-20 relative overflow-hidden bg-card/50">
       <div className="max-w-full mx-auto">
         <div className="text-center mb-12 px-4">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
