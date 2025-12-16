@@ -1,8 +1,22 @@
 import { ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import zedHero from "@/assets/zed-hero-banner.png";
 
 export function HeroSection() {
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    navigate("/auth?mode=signup");
+  };
+
+  const handleWatchDemo = () => {
+    const videoSection = document.getElementById("video-ads-section");
+    if (videoSection) {
+      videoSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
       {/* Background gradient */}
@@ -40,11 +54,11 @@ export function HeroSection() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button variant="hero" size="xl" className="group">
+              <Button variant="hero" size="xl" className="group" onClick={handleGetStarted}>
                 Get Started
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Button variant="heroOutline" size="xl" className="group">
+              <Button variant="heroOutline" size="xl" className="group" onClick={handleWatchDemo}>
                 <Play className="h-5 w-5" />
                 Watch Demo
               </Button>
