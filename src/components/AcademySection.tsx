@@ -1,44 +1,42 @@
 import { GraduationCap, BookOpen, Video, Award, Users, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import zedAcademyPose from "@/assets/zed-academy-pose.png";
-
-const courseModules = [
-  {
-    icon: BookOpen,
-    title: "AI Fundamentals",
-    description: "Master the basics of AI and machine learning for business applications.",
-    lessons: 12,
-  },
-  {
-    icon: Video,
-    title: "Course Creation",
-    description: "Learn to create and sell AI-powered courses that generate passive income.",
-    lessons: 18,
-  },
-  {
-    icon: TrendingUp,
-    title: "AI Marketing Mastery",
-    description: "Use AI to automate and optimize your marketing for maximum ROI.",
-    lessons: 15,
-  },
-  {
-    icon: Users,
-    title: "Community Building",
-    description: "Build and monetize an engaged community around your AI expertise.",
-    lessons: 10,
-  },
-];
-
-const stats = [
-  { value: "10K+", label: "Students Enrolled" },
-  { value: "95%", label: "Completion Rate" },
-  { value: "$50K+", label: "Avg. Student Revenue" },
-  { value: "24/7", label: "Community Access" },
-];
-
+const courseModules = [{
+  icon: BookOpen,
+  title: "AI Fundamentals",
+  description: "Master the basics of AI and machine learning for business applications.",
+  lessons: 12
+}, {
+  icon: Video,
+  title: "Course Creation",
+  description: "Learn to create and sell AI-powered courses that generate passive income.",
+  lessons: 18
+}, {
+  icon: TrendingUp,
+  title: "AI Marketing Mastery",
+  description: "Use AI to automate and optimize your marketing for maximum ROI.",
+  lessons: 15
+}, {
+  icon: Users,
+  title: "Community Building",
+  description: "Build and monetize an engaged community around your AI expertise.",
+  lessons: 10
+}];
+const stats = [{
+  value: "10K+",
+  label: "Students Enrolled"
+}, {
+  value: "95%",
+  label: "Completion Rate"
+}, {
+  value: "$50K+",
+  label: "Avg. Student Revenue"
+}, {
+  value: "24/7",
+  label: "Community Access"
+}];
 export function AcademySection() {
-  return (
-    <section id="academy" className="py-32 relative overflow-hidden">
+  return <section id="academy" className="py-32 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -72,22 +70,16 @@ export function AcademySection() {
 
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent rounded-3xl blur-3xl" />
-            <img 
-              src={zedAcademyPose} 
-              alt="ZED teaching at AI Academy" 
-              className="relative rounded-3xl shadow-2xl"
-            />
+            <img alt="ZED teaching at AI Academy" className="relative rounded-3xl shadow-2xl" src="/lovable-uploads/fedd7044-7828-4934-99ba-e93e8cc0162c.jpg" />
           </div>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
-          {stats.map((stat) => (
-            <div key={stat.label} className="text-center">
+          {stats.map(stat => <div key={stat.label} className="text-center">
               <div className="text-4xl font-bold text-primary mb-2">{stat.value}</div>
               <div className="text-muted-foreground">{stat.label}</div>
-            </div>
-          ))}
+            </div>)}
         </div>
 
         {/* Course Modules */}
@@ -95,11 +87,7 @@ export function AcademySection() {
           <h3 className="text-3xl font-bold text-center">What You'll Learn</h3>
           
           <div className="grid md:grid-cols-2 gap-6">
-            {courseModules.map((module, index) => (
-              <div
-                key={module.title}
-                className="group glass-card p-6 rounded-2xl hover:border-primary/50 transition-all duration-300 flex gap-6"
-              >
+            {courseModules.map((module, index) => <div key={module.title} className="group glass-card p-6 rounded-2xl hover:border-primary/50 transition-all duration-300 flex gap-6">
                 <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
                   <module.icon className="h-7 w-7 text-primary" />
                 </div>
@@ -112,8 +100,7 @@ export function AcademySection() {
                   </div>
                   <p className="text-muted-foreground">{module.description}</p>
                 </div>
-              </div>
-            ))}
+              </div>)}
           </div>
         </div>
 
@@ -130,6 +117,5 @@ export function AcademySection() {
           </Button>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 }
