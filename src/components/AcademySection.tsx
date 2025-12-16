@@ -1,6 +1,6 @@
 import { GraduationCap, BookOpen, Video, Award, Users, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import zedHero from "@/assets/zed-hero-banner.png";
+import zedAcademyPose from "@/assets/zed-academy-pose.png";
 
 const courseModules = [
   {
@@ -73,7 +73,7 @@ export function AcademySection() {
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent rounded-3xl blur-3xl" />
             <img 
-              src={zedHero} 
+              src={zedAcademyPose} 
               alt="ZED teaching at AI Academy" 
               className="relative rounded-3xl shadow-2xl"
             />
