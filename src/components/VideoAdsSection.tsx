@@ -1,17 +1,53 @@
-import { useState, useRef, useEffect } from "react";
-import { Play, Volume2, VolumeX } from "lucide-react";
+import { useState, useRef } from "react";
+import { Play, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-// Placeholder for 10 video slots
-const videoSlots = Array.from({ length: 10 }, (_, i) => ({
-  id: i + 1,
-  title: `Ad ${i + 1}`,
-  // Placeholder - user will upload their videos
-  videoUrl: null,
-}));
+// Video slots with the 3 uploaded videos first
+const videoSlots = [
+  { id: 1, title: "Demo 1", videoUrl: "/videos/demo-1.mp4" },
+  { id: 2, title: "Demo 2", videoUrl: "/videos/demo-2.mp4" },
+  { id: 3, title: "Demo 3", videoUrl: "/videos/demo-3.mp4" },
+  { id: 4, title: "Ad 4", videoUrl: null },
+  { id: 5, title: "Ad 5", videoUrl: null },
+  { id: 6, title: "Ad 6", videoUrl: null },
+  { id: 7, title: "Ad 7", videoUrl: null },
+  { id: 8, title: "Ad 8", videoUrl: null },
+  { id: 9, title: "Ad 9", videoUrl: null },
+  { id: 10, title: "Ad 10", videoUrl: null },
+];
 
 export function VideoAdsSection() {
   const [activeVideo, setActiveVideo] = useState<number | null>(null);
+  const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
+
+  const scrollLeft = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollBy({ left: -340, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollBy({ left: 340, behavior: "smooth" });
+    }
+  };
+
+  const handleMouseEnter = (slotId: number, hasVideo: boolean) => {
+    setHoveredVideo(slotId);
+    if (hasVideo && videoRefs.current[slotId]) {
+      videoRefs.current[slotId]!.play();
+    }
+  };
+
+  const handleMouseLeave = (slotId: number, hasVideo: boolean) => {
+    setHoveredVideo(null);
+    if (hasVideo && videoRefs.current[slotId]) {
+      videoRefs.current[slotId]!.pause();
+      videoRefs.current[slotId]!.currentTime = 0;
+    }
+  };
 
   return (
     <section id="video-ads-section" className="py-20 relative overflow-hidden bg-card/50">
@@ -26,33 +62,65 @@ export function VideoAdsSection() {
           </p>
         </div>
 
-        {/* Scrolling Video Container */}
+        {/* Scrolling Video Container with Arrows */}
         <div className="relative">
+          {/* Left Arrow */}
+          <Button
+            variant="outline"
+            size="icon"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm hover:bg-background"
+            onClick={scrollLeft}
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
+
+          {/* Right Arrow */}
+          <Button
+            variant="outline"
+            size="icon"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm hover:bg-background"
+            onClick={scrollRight}
+          >
+            <ChevronRight className="h-6 w-6" />
+          </Button>
+
           <div 
             ref={containerRef}
-            className="flex gap-6 overflow-x-auto pb-6 px-8 scrollbar-hide"
+            className="flex gap-6 overflow-x-auto pb-6 px-16 scrollbar-hide"
             style={{ 
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
             }}
           >
-            {/* Duplicate for infinite scroll effect */}
-            {[...videoSlots, ...videoSlots].map((slot, index) => (
+            {videoSlots.map((slot) => (
               <div
-                key={`${slot.id}-${index}`}
-                className="flex-shrink-0 w-80 h-[450px] glass-card rounded-2xl overflow-hidden group cursor-pointer hover:scale-105 transition-transform duration-300"
+                key={slot.id}
+                className={`flex-shrink-0 w-80 h-[450px] glass-card rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 ${
+                  hoveredVideo === slot.id ? "scale-105 shadow-2xl z-10" : ""
+                }`}
+                onMouseEnter={() => handleMouseEnter(slot.id, !!slot.videoUrl)}
+                onMouseLeave={() => handleMouseLeave(slot.id, !!slot.videoUrl)}
                 onClick={() => setActiveVideo(slot.id)}
               >
                 {slot.videoUrl ? (
-                  <video
-                    className="w-full h-full object-cover"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                  >
-                    <source src={slot.videoUrl} type="video/mp4" />
-                  </video>
+                  <div className="relative w-full h-full">
+                    <video
+                      ref={(el) => (videoRefs.current[slot.id] = el)}
+                      className="w-full h-full object-cover"
+                      loop
+                      playsInline
+                      preload="metadata"
+                    >
+                      <source src={slot.videoUrl} type="video/mp4" />
+                    </video>
+                    {hoveredVideo !== slot.id && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-background/30">
+                        <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
+                          <Play className="h-8 w-8 text-primary" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-primary/20 to-secondary">
                     <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4 group-hover:bg-primary/30 transition-colors">
@@ -63,12 +131,12 @@ export function VideoAdsSection() {
                   </div>
                 )}
                 
-                {/* Overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <h4 className="font-semibold">{slot.title}</h4>
-                    <p className="text-sm text-muted-foreground">Click to play</p>
-                  </div>
+                {/* Title overlay */}
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/90 via-background/50 to-transparent p-4">
+                  <h4 className="font-semibold">{slot.title}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {slot.videoUrl ? "Hover to play" : "Click to preview"}
+                  </p>
                 </div>
               </div>
             ))}
@@ -85,12 +153,23 @@ export function VideoAdsSection() {
             className="fixed inset-0 z-50 bg-background/90 flex items-center justify-center p-4"
             onClick={() => setActiveVideo(null)}
           >
-            <div className="max-w-4xl w-full aspect-video glass-card rounded-2xl overflow-hidden flex items-center justify-center">
-              <div className="text-center p-8">
-                <Play className="h-16 w-16 text-primary mx-auto mb-4" />
-                <p className="text-muted-foreground">Video {activeVideo} will play here</p>
-                <p className="text-sm text-muted-foreground/70 mt-2">Upload your video to this slot</p>
-              </div>
+            <div className="max-w-4xl w-full aspect-video glass-card rounded-2xl overflow-hidden">
+              {videoSlots.find(s => s.id === activeVideo)?.videoUrl ? (
+                <video
+                  className="w-full h-full object-cover"
+                  autoPlay
+                  controls
+                  playsInline
+                >
+                  <source src={videoSlots.find(s => s.id === activeVideo)?.videoUrl || ""} type="video/mp4" />
+                </video>
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center">
+                  <Play className="h-16 w-16 text-primary mx-auto mb-4" />
+                  <p className="text-muted-foreground">Video {activeVideo} will play here</p>
+                  <p className="text-sm text-muted-foreground/70 mt-2">Upload your video to this slot</p>
+                </div>
+              )}
             </div>
           </div>
         )}
