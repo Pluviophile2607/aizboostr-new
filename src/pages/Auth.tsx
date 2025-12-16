@@ -3,6 +3,7 @@ import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, User, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/aizboostr-logo.png";
 
 export default function Auth() {
@@ -24,25 +25,89 @@ export default function Auth() {
     setIsSignUp(searchParams.get("mode") === "signup");
   }, [searchParams]);
 
+  // Check if user is already logged in
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session?.user) {
+          navigate("/");
+        }
+      }
+    );
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        navigate("/");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate auth - will be replaced with real auth when Lovable Cloud is enabled
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+            data: {
+              full_name: formData.name,
+            }
+          }
+        });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Account created!",
+          description: "You're now signed in.",
+        });
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Welcome back!",
+          description: "Successfully signed in.",
+        });
+      }
+    } catch (error: any) {
       toast({
-        title: isSignUp ? "Account created!" : "Welcome back!",
-        description: "Authentication will work once Lovable Cloud is connected.",
+        title: "Error",
+        description: error.message || "Something went wrong",
+        variant: "destructive",
       });
-    }, 1500);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleGoogleSignIn = () => {
-    toast({
-      title: "Google Sign In",
-      description: "Connect Lovable Cloud to enable Google authentication.",
-    });
+  const handleGoogleSignIn = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        }
+      });
+      
+      if (error) throw error;
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to sign in with Google",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
