@@ -118,6 +118,15 @@
   .animate-scale-in {
     animation: scale-in 0.5s ease-out forwards;
   }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @keyframes float {

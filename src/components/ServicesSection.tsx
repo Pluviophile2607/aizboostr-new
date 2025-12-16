@@ -1,4 +1,5 @@
-import { Bot, Megaphone, GraduationCap, Server, Sparkles, Zap } from "lucide-react";
+import { Bot, Megaphone, GraduationCap, Server, Sparkles, Zap, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import zedCharacter from "@/assets/zed-character.png";
 
 const services = [
@@ -6,31 +7,37 @@ const services = [
     icon: Bot,
     title: "AI Automation",
     description: "Automate your business processes with intelligent AI systems that work 24/7.",
+    slug: "ai-automation",
   },
   {
     icon: Megaphone,
     title: "AI Marketing",
     description: "Data-driven marketing campaigns powered by advanced AI analytics.",
+    slug: "ai-marketing",
   },
   {
     icon: GraduationCap,
     title: "AI Academy",
     description: "Learn to build and sell AI-powered courses with our comprehensive training.",
+    slug: "ai-academy",
   },
   {
     icon: Server,
     title: "SaaS Solutions",
     description: "Custom software solutions built with cutting-edge AI technology.",
+    slug: "saas-solutions",
   },
   {
     icon: Sparkles,
     title: "Brand Building",
     description: "Transform your brand identity with AI-generated content and strategies.",
+    slug: "brand-building",
   },
   {
     icon: Zap,
     title: "AI Systems",
     description: "Enterprise-grade AI infrastructure for scalable business growth.",
+    slug: "ai-systems",
   },
 ];
 
@@ -50,19 +57,24 @@ export function ServicesSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Horizontal scrolling cards */}
+        <div className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory scrollbar-hide -mx-4 px-4">
           {services.map((service, index) => (
-            <div
+            <Link
+              to={`/service/${service.slug}`}
               key={service.title}
-              className="group glass-card p-8 rounded-2xl hover:border-primary/50 transition-all duration-300 hover:-translate-y-2"
+              className="group glass-card p-8 rounded-2xl hover:border-primary/50 transition-all duration-500 hover:-translate-y-2 hover:scale-105 flex-shrink-0 w-80 snap-center cursor-pointer animate-scale-in"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
                 <service.icon className="h-7 w-7 text-primary" />
               </div>
               <h3 className="text-xl font-semibold mb-3">{service.title}</h3>
-              <p className="text-muted-foreground">{service.description}</p>
-            </div>
+              <p className="text-muted-foreground mb-4">{service.description}</p>
+              <div className="flex items-center gap-2 text-primary font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                Learn More <ArrowRight className="h-4 w-4" />
+              </div>
+            </Link>
           ))}
         </div>
 
