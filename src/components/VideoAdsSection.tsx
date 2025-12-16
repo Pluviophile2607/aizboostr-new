@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -19,8 +19,28 @@ const videoSlots = [
 export function VideoAdsSection() {
   const [activeVideo, setActiveVideo] = useState<number | null>(null);
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
+
+  // Auto-scroll effect
+  useEffect(() => {
+    if (isPaused || activeVideo) return;
+    
+    const interval = setInterval(() => {
+      if (containerRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = containerRef.current;
+        // If we've scrolled to the end, reset to start
+        if (scrollLeft + clientWidth >= scrollWidth - 10) {
+          containerRef.current.scrollTo({ left: 0, behavior: "smooth" });
+        } else {
+          containerRef.current.scrollBy({ left: 2, behavior: "auto" });
+        }
+      }
+    }, 30);
+
+    return () => clearInterval(interval);
+  }, [isPaused, activeVideo]);
 
   const scrollLeft = () => {
     if (containerRef.current) {
@@ -34,8 +54,20 @@ export function VideoAdsSection() {
     }
   };
 
+  // Stop all videos except the one being hovered
+  const stopAllVideosExcept = (exceptId: number | null) => {
+    Object.entries(videoRefs.current).forEach(([id, video]) => {
+      if (video && Number(id) !== exceptId) {
+        video.pause();
+        video.currentTime = 0;
+      }
+    });
+  };
+
   const handleMouseEnter = (slotId: number, hasVideo: boolean) => {
     setHoveredVideo(slotId);
+    setIsPaused(true);
+    stopAllVideosExcept(slotId);
     if (hasVideo && videoRefs.current[slotId]) {
       videoRefs.current[slotId]!.play();
     }
@@ -43,6 +75,7 @@ export function VideoAdsSection() {
 
   const handleMouseLeave = (slotId: number, hasVideo: boolean) => {
     setHoveredVideo(null);
+    setIsPaused(false);
     if (hasVideo && videoRefs.current[slotId]) {
       videoRefs.current[slotId]!.pause();
       videoRefs.current[slotId]!.currentTime = 0;
