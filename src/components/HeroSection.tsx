@@ -39,7 +39,7 @@ export function HeroSection() {
             
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight">
               <span className="block">Build Your</span>
-              <span className="block glow-text text-primary">Brand with AIZBOOSTR</span>
+              <span className="block glow-text text-primary bg-secondary">Brand with AIZBOOSTR</span>
             </h1>
             
             <p className="text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0">
