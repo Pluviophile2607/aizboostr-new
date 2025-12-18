@@ -6,7 +6,7 @@ import logo from "@/assets/aiz-logo.jpeg";
 
 const navLinks = [
   { name: "Services", href: "/service/ai-automation", icon: Bot },
-  { name: "Plans", href: "/service/brand-building", icon: CreditCard },
+  { name: "Plans", href: "/custom-packages", icon: CreditCard },
   { name: "AI Academy", href: "/service/ai-academy", icon: GraduationCap },
   { name: "SaaS", href: "/service/saas-solutions", icon: Server },
   { name: "AI Systems", href: "/service/ai-systems", icon: Sparkles },
