@@ -20,8 +20,17 @@ export function VideoAdsSection() {
   const [activeVideo, setActiveVideo] = useState<number | null>(null);
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
+
+  // Detect touch device
+  useEffect(() => {
+    const checkTouch = () => {
+      setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    };
+    checkTouch();
+  }, []);
 
   // Auto-scroll effect
   useEffect(() => {
@@ -65,6 +74,9 @@ export function VideoAdsSection() {
   };
 
   const handleMouseEnter = (slotId: number, hasVideo: boolean) => {
+    // Skip hover behavior on touch devices to prevent double playback
+    if (isTouchDevice) return;
+    
     setHoveredVideo(slotId);
     setIsPaused(true);
     stopAllVideosExcept(slotId);
@@ -74,12 +86,21 @@ export function VideoAdsSection() {
   };
 
   const handleMouseLeave = (slotId: number, hasVideo: boolean) => {
+    // Skip hover behavior on touch devices
+    if (isTouchDevice) return;
+    
     setHoveredVideo(null);
     setIsPaused(false);
     if (hasVideo && videoRefs.current[slotId]) {
       videoRefs.current[slotId]!.pause();
       videoRefs.current[slotId]!.currentTime = 0;
     }
+  };
+
+  const handleClick = (slotId: number, hasVideo: boolean) => {
+    // Stop any playing preview videos before opening modal
+    stopAllVideosExcept(null);
+    setActiveVideo(slotId);
   };
 
   return (
@@ -133,7 +154,7 @@ export function VideoAdsSection() {
                 }`}
                 onMouseEnter={() => handleMouseEnter(slot.id, !!slot.videoUrl)}
                 onMouseLeave={() => handleMouseLeave(slot.id, !!slot.videoUrl)}
-                onClick={() => setActiveVideo(slot.id)}
+                onClick={() => handleClick(slot.id, !!slot.videoUrl)}
               >
                 {slot.videoUrl ? (
                   <div className="relative w-full h-full">
