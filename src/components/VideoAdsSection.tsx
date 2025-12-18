@@ -272,13 +272,13 @@ export function VideoAdsSection() {
         {/* Video Modal */}
         {activeVideo && (
           <div 
-            className="fixed inset-0 z-50 bg-background/90 flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-background/90 flex items-center justify-center p-2 sm:p-4"
             onClick={() => setActiveVideo(null)}
           >
-            <div className="max-w-4xl w-full aspect-video glass-card rounded-2xl overflow-hidden">
+            <div className="w-full h-full max-w-4xl max-h-[90vh] flex items-center justify-center">
               {videoSlots.find(s => s.id === activeVideo)?.videoUrl ? (
                 <video
-                  className="w-full h-full object-cover"
+                  className="max-w-full max-h-full w-auto h-auto object-contain rounded-2xl"
                   autoPlay
                   controls
                   playsInline
@@ -286,7 +286,7 @@ export function VideoAdsSection() {
                   <source src={videoSlots.find(s => s.id === activeVideo)?.videoUrl || ""} type="video/mp4" />
                 </video>
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center">
+                <div className="w-full max-w-md aspect-video glass-card rounded-2xl flex flex-col items-center justify-center">
                   <Play className="h-16 w-16 text-primary mx-auto mb-4" />
                   <p className="text-muted-foreground">Video {activeVideo} will play here</p>
                   <p className="text-sm text-muted-foreground/70 mt-2">Upload your video to this slot</p>
