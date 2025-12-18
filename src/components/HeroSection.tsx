@@ -2,37 +2,31 @@ import { ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import zedHero from "@/assets/zed-hero-banner.png";
-
 export function HeroSection() {
   const navigate = useNavigate();
-
   const handleGetStarted = () => {
     navigate("/auth?mode=signup");
   };
-
   const handleWatchDemo = () => {
     const videoSection = document.getElementById("video-ads-section");
     if (videoSection) {
-      videoSection.scrollIntoView({ behavior: "smooth" });
+      videoSection.scrollIntoView({
+        behavior: "smooth"
+      });
     }
   };
-
-  return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+  return <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background" />
       
       {/* Animated grid */}
-      <div 
-        className="absolute inset-0 opacity-20"
-        style={{
-          backgroundImage: `
+      <div className="absolute inset-0 opacity-20" style={{
+      backgroundImage: `
             linear-gradient(hsl(var(--primary) / 0.1) 1px, transparent 1px),
             linear-gradient(90deg, hsl(var(--primary) / 0.1) 1px, transparent 1px)
           `,
-          backgroundSize: '50px 50px'
-        }}
-      />
+      backgroundSize: '50px 50px'
+    }} />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -45,7 +39,7 @@ export function HeroSection() {
             
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight">
               <span className="block">Build Your</span>
-              <span className="block glow-text text-primary">Brand with AI</span>
+              <span className="block glow-text text-primary">Brand with AIZBOOSTR</span>
             </h1>
             
             <p className="text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0">
@@ -84,11 +78,7 @@ export function HeroSection() {
           {/* ZED Character */}
           <div className="relative animate-scale-in">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent rounded-3xl blur-3xl" />
-            <img 
-              src={zedHero} 
-              alt="ZED - AIZboostr Brand Ambassador" 
-              className="relative w-full max-w-lg mx-auto animate-float rounded-3xl"
-            />
+            <img src={zedHero} alt="ZED - AIZboostr Brand Ambassador" className="relative w-full max-w-lg mx-auto animate-float rounded-3xl" />
             {/* Floating badge */}
             <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 glass-card px-6 py-3 rounded-full">
               <span className="text-sm font-medium">Meet ZED 👋</span>
@@ -112,6 +102,5 @@ export function HeroSection() {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 }
