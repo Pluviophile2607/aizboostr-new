@@ -38,22 +38,18 @@ export function ServicesSection() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Horizontal scrolling cards at top */}
         <nav className="mb-16">
-          <div className="flex flex-col gap-4">
-            {services.map((service, index) => <Link to={`/service/${service.slug}`} key={service.title} className="block group" style={{
+          <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+            {services.map((service, index) => <Link to={`/service/${service.slug}`} key={service.title} className="group flex-shrink-0 w-72 snap-center" style={{
             animationDelay: `${index * 100}ms`
           }}>
-                <article className="glass-card rounded-3xl p-8 sm:p-12 flex flex-col sm:flex-row items-center justify-between gap-6 transition-all duration-300 hover:border-primary/30">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors duration-300">
-                      <service.icon className="h-7 w-7 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl sm:text-2xl font-bold text-foreground">{service.title}</h3>
-                      <p className="text-muted-foreground">{service.description}</p>
-                    </div>
+                <article className="bg-card border border-border rounded-2xl p-6 h-full transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/30">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
+                    <service.icon className="h-6 w-6 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
                   </div>
-                  <div className="flex items-center gap-2 text-primary font-medium">
-                    Explore <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                  <h3 className="text-lg font-semibold mb-2 text-card-foreground">{service.title}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2">{service.description}</p>
+                  <div className="flex items-center gap-1.5 text-primary text-sm font-medium mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    Explore <ArrowRight className="h-4 w-4" />
                   </div>
                 </article>
               </Link>)}
