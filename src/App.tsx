@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ServicePage from "./pages/ServicePage";
+import CustomPackages from "./pages/CustomPackages";
 import NotFound from "./pages/NotFound";
 import IntroVideo from "./components/IntroVideo";
 
@@ -38,6 +39,7 @@ const App = () => {
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/service/:slug" element={<ServicePage />} />
+          <Route path="/custom-packages" element={<CustomPackages />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

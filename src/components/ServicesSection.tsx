@@ -1,6 +1,5 @@
-import { Bot, Megaphone, GraduationCap, Server, Sparkles, Zap, ArrowRight } from "lucide-react";
+import { Bot, Megaphone, GraduationCap, Server, Sparkles, Zap, ArrowRight, Package } from "lucide-react";
 import { Link } from "react-router-dom";
-import zedHero from "@/assets/zed-hero-banner.png";
 const services = [{
   icon: Bot,
   title: "AI Automation",
@@ -67,10 +66,23 @@ export function ServicesSection() {
           </p>
         </div>
 
-        {/* ZED CTA */}
-        <div className="mt-20 glass-card rounded-3xl overflow-hidden">
-          
-        </div>
+        {/* Custom Packages CTA */}
+        <Link to="/custom-packages" className="block mt-20 group">
+          <div className="glass-card rounded-3xl p-8 sm:p-12 flex flex-col sm:flex-row items-center justify-between gap-6 transition-all duration-300 hover:border-primary/30">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors duration-300">
+                <Package className="h-7 w-7 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
+              </div>
+              <div>
+                <h3 className="text-xl sm:text-2xl font-bold text-foreground">Custom Packages</h3>
+                <p className="text-muted-foreground">Tailored AI solutions for your unique business needs</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-primary font-medium">
+              Explore Options <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+            </div>
+          </div>
+        </Link>
       </div>
     </section>;
 }
