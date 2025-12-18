@@ -43,8 +43,10 @@ export function VideoAdsSection() {
     const interval = setInterval(() => {
       if (containerRef.current) {
         const { scrollLeft, scrollWidth, clientWidth } = containerRef.current;
-        // If we've scrolled to the end, reset to start
-        if (scrollLeft + clientWidth >= scrollWidth - 10) {
+        const maxScroll = scrollWidth - clientWidth;
+        
+        // If we've scrolled to the end (or very close), reset to start
+        if (scrollLeft >= maxScroll - 5) {
           containerRef.current.scrollTo({ left: 0, behavior: "smooth" });
         } else {
           containerRef.current.scrollBy({ left: 2, behavior: "auto" });
