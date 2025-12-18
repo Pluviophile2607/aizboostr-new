@@ -21,6 +21,10 @@ export function VideoAdsSection() {
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
   const [isPaused, setIsPaused] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [scrollStartX, setScrollStartX] = useState(0);
+  const [hasDragged, setHasDragged] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
 
@@ -34,7 +38,7 @@ export function VideoAdsSection() {
 
   // Auto-scroll effect
   useEffect(() => {
-    if (isPaused || activeVideo) return;
+    if (isPaused || activeVideo || isDragging) return;
     
     const interval = setInterval(() => {
       if (containerRef.current) {
@@ -49,7 +53,56 @@ export function VideoAdsSection() {
     }, 30);
 
     return () => clearInterval(interval);
-  }, [isPaused, activeVideo]);
+  }, [isPaused, activeVideo, isDragging]);
+
+  // Mouse drag handlers for desktop
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    setIsDragging(true);
+    setHasDragged(false);
+    setDragStartX(e.pageX);
+    setScrollStartX(containerRef.current.scrollLeft);
+    setIsPaused(true);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !containerRef.current) return;
+    e.preventDefault();
+    const deltaX = e.pageX - dragStartX;
+    if (Math.abs(deltaX) > 5) {
+      setHasDragged(true);
+    }
+    containerRef.current.scrollLeft = scrollStartX - deltaX;
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    setTimeout(() => setIsPaused(false), 100);
+  };
+
+  // Touch swipe handlers for mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!containerRef.current) return;
+    setIsDragging(true);
+    setHasDragged(false);
+    setDragStartX(e.touches[0].pageX);
+    setScrollStartX(containerRef.current.scrollLeft);
+    setIsPaused(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || !containerRef.current) return;
+    const deltaX = e.touches[0].pageX - dragStartX;
+    if (Math.abs(deltaX) > 5) {
+      setHasDragged(true);
+    }
+    containerRef.current.scrollLeft = scrollStartX - deltaX;
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    setTimeout(() => setIsPaused(false), 100);
+  };
 
   const scrollLeft = () => {
     if (containerRef.current) {
@@ -75,7 +128,7 @@ export function VideoAdsSection() {
 
   const handleMouseEnter = (slotId: number, hasVideo: boolean) => {
     // Skip hover behavior on touch devices to prevent double playback
-    if (isTouchDevice) return;
+    if (isTouchDevice || isDragging) return;
     
     setHoveredVideo(slotId);
     setIsPaused(true);
@@ -98,6 +151,8 @@ export function VideoAdsSection() {
   };
 
   const handleClick = (slotId: number, hasVideo: boolean) => {
+    // Prevent click if user was dragging
+    if (hasDragged) return;
     // Stop any playing preview videos before opening modal
     stopAllVideosExcept(null);
     setActiveVideo(slotId);
@@ -140,11 +195,19 @@ export function VideoAdsSection() {
 
           <div 
             ref={containerRef}
-            className="flex gap-6 overflow-x-auto pb-6 px-16 scrollbar-hide"
+            className={`flex gap-6 overflow-x-auto pb-6 px-16 scrollbar-hide ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
             style={{ 
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
+              userSelect: 'none',
             }}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             {videoSlots.map((slot) => (
               <div
