@@ -45,12 +45,12 @@ const resources = [
 
 export function SupportSection() {
   return (
-    <section id="support" className="py-32 relative">
+    <section id="support" className="py-32 relative bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16 space-y-4">
-          <h2 className="text-4xl sm:text-5xl font-bold">
+          <h2 className="text-4xl sm:text-5xl font-bold text-foreground">
             We're Here to
-            <span className="text-primary glow-text"> Help</span>
+            <span className="text-foreground"> Help</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Our dedicated support team is ready to assist you on your AI journey.
@@ -62,14 +62,14 @@ export function SupportSection() {
           {supportOptions.map((option) => (
             <div
               key={option.title}
-              className="glass-card p-8 rounded-2xl text-center hover:border-primary/50 transition-all duration-300"
+              className="bg-card border border-border p-8 rounded-2xl text-center hover:border-foreground/30 hover:shadow-lg transition-all duration-300"
             >
-              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                <option.icon className="h-8 w-8 text-primary" />
+              <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-6">
+                <option.icon className="h-8 w-8 text-foreground" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">{option.title}</h3>
+              <h3 className="text-xl font-semibold mb-2 text-foreground">{option.title}</h3>
               <p className="text-muted-foreground mb-4">{option.description}</p>
-              <div className="text-sm text-primary mb-6">{option.available}</div>
+              <div className="text-sm text-foreground font-medium mb-6">{option.available}</div>
               <Button variant="outline" className="w-full">
                 {option.action}
               </Button>
@@ -78,19 +78,19 @@ export function SupportSection() {
         </div>
 
         {/* Resources */}
-        <div className="glass-card p-8 lg:p-12 rounded-3xl">
-          <h3 className="text-2xl font-bold mb-8 text-center">Self-Help Resources</h3>
+        <div className="bg-card border border-border p-8 lg:p-12 rounded-3xl">
+          <h3 className="text-2xl font-bold mb-8 text-center text-foreground">Self-Help Resources</h3>
           <div className="grid md:grid-cols-3 gap-6">
             {resources.map((resource) => (
               <button
                 key={resource.title}
-                className="flex items-center gap-4 p-4 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors text-left w-full"
+                className="flex items-center gap-4 p-4 rounded-xl bg-secondary hover:bg-secondary/80 transition-colors text-left w-full"
               >
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <resource.icon className="h-6 w-6 text-primary" />
+                <div className="w-12 h-12 rounded-lg bg-background border border-border flex items-center justify-center flex-shrink-0">
+                  <resource.icon className="h-6 w-6 text-foreground" />
                 </div>
                 <div>
-                  <h4 className="font-semibold">{resource.title}</h4>
+                  <h4 className="font-semibold text-foreground">{resource.title}</h4>
                   <p className="text-sm text-muted-foreground">{resource.description}</p>
                 </div>
               </button>
