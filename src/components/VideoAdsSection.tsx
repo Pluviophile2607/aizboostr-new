@@ -77,7 +77,8 @@ export function VideoAdsSection() {
 
   const handleMouseUp = () => {
     setIsDragging(false);
-    setTimeout(() => setIsPaused(false), 100);
+    // Keep paused longer after manual interaction to allow free scrolling
+    setTimeout(() => setIsPaused(false), 2000);
   };
 
   // Touch swipe handlers for mobile
@@ -101,19 +102,23 @@ export function VideoAdsSection() {
 
   const handleTouchEnd = () => {
     setIsDragging(false);
-    setTimeout(() => setIsPaused(false), 100);
+    setTimeout(() => setIsPaused(false), 2000);
   };
 
   const scrollLeft = () => {
+    setIsPaused(true);
     if (containerRef.current) {
       containerRef.current.scrollBy({ left: -340, behavior: "smooth" });
     }
+    setTimeout(() => setIsPaused(false), 2000);
   };
 
   const scrollRight = () => {
+    setIsPaused(true);
     if (containerRef.current) {
       containerRef.current.scrollBy({ left: 340, behavior: "smooth" });
     }
+    setTimeout(() => setIsPaused(false), 2000);
   };
 
   // Stop all videos except the one being hovered
