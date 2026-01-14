@@ -33,13 +33,28 @@ export function VideoAdsSection() {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setIsInView(true);
-            // Load all videos when section comes into view
+            // Load and PLAY all videos when section comes into view
             Object.values(videoRefs.current).forEach((video) => {
-              if (video && video.preload === 'none') {
-                video.preload = 'metadata';
-                video.load();
+              if (video) {
+                if (video.preload === 'none') {
+                    video.preload = 'metadata';
+                    video.load();
+                }
+                video.muted = true;
+                const playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("Auto-play prevented:", error);
+                    });
+                }
               }
             });
+          } else {
+             // Optional: Pause videos when out of view to save resources
+             setIsInView(false);
+             Object.values(videoRefs.current).forEach((video) => {
+                if (video) video.pause();
+             });
           }
         });
       },
@@ -113,9 +128,14 @@ export function VideoAdsSection() {
 
   const stopAllVideosExcept = (exceptIndex: number | null) => {
     Object.entries(videoRefs.current).forEach(([index, video]) => {
+      // With auto-play on scroll, we only pause others when one is HOVERED (exceptIndex is not null)
+      // When exceptIndex is null (e.g. initial load or reset), we usually want them running or stopped based on view.
+      // But this function is historically used to "stop others".
+      // If we hover one, we want others to pause.
       if (video && Number(index) !== exceptIndex) {
         video.pause();
-        video.currentTime = 0;
+        // We might NOT want to reset currentTime=0 if we want them to resume later? 
+        // But for "focus" effect, pausing is good.
       }
     });
   };
@@ -146,14 +166,15 @@ export function VideoAdsSection() {
     setIsPaused(false);
     if (hasVideo && videoRefs.current[index]) {
       const video = videoRefs.current[index]!;
-      video.pause();
-      video.currentTime = 0;
-      video.muted = true; // Re-mute when hover ends
+      // Resume playing muted instead of pausing
+      video.muted = true; 
+      video.play().catch(e => console.log("Resume play failed", e));
     }
   };
 
   const handleClick = (slotId: number) => {
-    stopAllVideosExcept(null);
+    // When clicking, we might want to pause the specific card video so the modal takes over?
+    // Modal covers everything anyway.
     setActiveVideo(slotId);
   };
 

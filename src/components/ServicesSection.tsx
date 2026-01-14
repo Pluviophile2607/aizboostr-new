@@ -1,61 +1,14 @@
-import { Bot, Megaphone, Sparkles, Zap, ArrowRight, Package } from "lucide-react";
+import { ArrowRight, Package } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const services = [
-  {
-    icon: Bot,
-    title: "AI Automation",
-    description: "Automate your business processes with intelligent AI systems that work 24/7.",
-    slug: "ai-automation"
-  },
-  {
-    icon: Megaphone,
-    title: "AI Marketing",
-    description: "Data-driven marketing campaigns powered by advanced AI analytics.",
-    slug: "ai-marketing"
-  },
-  {
-    icon: Sparkles,
-    title: "Brand Building",
-    description: "Transform your brand identity with AI-generated content and strategies.",
-    slug: "brand-building"
-  },
-  {
-    icon: Zap,
-    title: "AI Systems",
-    description: "Enterprise-grade AI infrastructure for scalable business growth.",
-    slug: "ai-systems"
-  }
-];
+
 
 export function ServicesSection() {
   return (
     <section id="services" className="pt-8 pb-32 relative bg-background">
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Horizontal scrolling cards at top */}
-        <nav className="mb-16">
-          <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-            {services.map((service, index) => (
-              <Link 
-                to={`/service/${service.slug}`} 
-                key={service.title} 
-                className="group flex-shrink-0 w-72 snap-center"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <article className="bg-card border border-border rounded-2xl p-6 h-full transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-lg hover:border-foreground/20">
-                  <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-4 group-hover:bg-foreground group-hover:text-background transition-colors duration-300">
-                    <service.icon className="h-6 w-6 text-foreground group-hover:text-background transition-colors duration-300" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2 text-card-foreground">{service.title}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2">{service.description}</p>
-                  <div className="flex items-center gap-1.5 text-foreground text-sm font-medium mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    Explore <ArrowRight className="h-4 w-4" />
-                  </div>
-                </article>
-              </Link>
-            ))}
-          </div>
-        </nav>
+
 
         <div className="text-center mb-16 space-y-4">
           <h2 className="text-4xl sm:text-5xl font-bold text-foreground">
