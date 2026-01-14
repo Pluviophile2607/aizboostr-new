@@ -25,6 +25,7 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [showLoginSuccess, setShowLoginSuccess] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [isResetting, setIsResetting] = useState(false);
@@ -56,10 +57,7 @@ export default function Auth() {
         setShowSuccessPopup(true);
       } else {
         await signIn(formData.email, formData.password);
-        toast({
-          title: "Welcome back!",
-          description: "Successfully signed in.",
-        });
+        setShowLoginSuccess(true);
       }
     } catch (error: any) {
       let errorMessage = "Something went wrong";
@@ -96,10 +94,7 @@ export default function Auth() {
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
-      toast({
-        title: "Welcome!",
-        description: "Successfully signed in with Google.",
-      });
+      setShowLoginSuccess(true);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -162,6 +157,26 @@ export default function Auth() {
           <div className="flex justify-center mt-4">
             <Button variant="hero" onClick={handleSuccessClose}>
               Get Started
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Login Success Popup */}
+      <Dialog open={showLoginSuccess} onOpenChange={setShowLoginSuccess}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="text-center">
+            <div className="mx-auto mb-4 w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+              <CheckCircle className="w-10 h-10 text-blue-600 dark:text-blue-400" />
+            </div>
+            <DialogTitle className="text-2xl text-center">Welcome Back!</DialogTitle>
+            <DialogDescription className="text-center">
+              You have successfully signed in to AIZboostr. Let's continue building your brand with AI!
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center mt-4">
+            <Button variant="hero" onClick={() => { setShowLoginSuccess(false); navigate("/"); }}>
+              Continue
             </Button>
           </div>
         </DialogContent>

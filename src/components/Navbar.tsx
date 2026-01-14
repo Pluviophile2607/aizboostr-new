@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Menu, X, Bot, CreditCard, HeadphonesIcon, Video } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Menu, X, Bot, CreditCard, HeadphonesIcon, Video, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/aiz-logo.jpeg";
 
 const navLinks = [
@@ -13,6 +14,13 @@ const navLinks = [
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
@@ -42,18 +50,35 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Auth Buttons */}
+          {/* Auth Buttons - Show based on login state */}
           <div className="hidden lg:flex items-center gap-3">
-            <Link to="/auth">
-              <Button variant="ghost" size="sm">
-                Sign In
-              </Button>
-            </Link>
-            <Link to="/auth?mode=signup">
-              <Button variant="hero" size="sm">
-                Get Started
-              </Button>
-            </Link>
+            {user ? (
+              <>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">
+                    {user.displayName || user.email?.split('@')[0]}
+                  </span>
+                </div>
+                <Button variant="ghost" size="sm" onClick={handleLogout}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/auth">
+                  <Button variant="ghost" size="sm">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/auth?mode=signup">
+                  <Button variant="hero" size="sm">
+                    Get Started
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -82,16 +107,33 @@ export function Navbar() {
               </Link>
             ))}
             <div className="pt-4 flex flex-col gap-2">
-              <Link to="/auth" onClick={() => setIsOpen(false)}>
-                <Button variant="outline" className="w-full">
-                  Sign In
-                </Button>
-              </Link>
-              <Link to="/auth?mode=signup" onClick={() => setIsOpen(false)}>
-                <Button variant="hero" className="w-full">
-                  Get Started
-                </Button>
-              </Link>
+              {user ? (
+                <>
+                  <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-secondary">
+                    <User className="h-5 w-5 text-muted-foreground" />
+                    <span className="font-medium text-foreground">
+                      {user.displayName || user.email?.split('@')[0]}
+                    </span>
+                  </div>
+                  <Button variant="outline" className="w-full" onClick={() => { handleLogout(); setIsOpen(false); }}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link to="/auth" onClick={() => setIsOpen(false)}>
+                    <Button variant="outline" className="w-full">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link to="/auth?mode=signup" onClick={() => setIsOpen(false)}>
+                    <Button variant="hero" className="w-full">
+                      Get Started
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
