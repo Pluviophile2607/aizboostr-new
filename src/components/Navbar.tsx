@@ -118,13 +118,25 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="lg:hidden p-2 text-foreground"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          {/* Mobile Theme Toggle & Menu Button */}
+          <div className="lg:hidden flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="rounded-full w-9 h-9"
+            >
+              <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+            <button
+              className="p-2 text-foreground"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -144,19 +156,6 @@ export function Navbar() {
               </Link>
             ))}
             <div className="pt-4 flex flex-col gap-2">
-              <div className="flex items-center justify-between px-4 py-2">
-                <span className="text-sm font-medium text-muted-foreground">Theme</span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="rounded-full w-9 h-9"
-                >
-                  <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                  <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                  <span className="sr-only">Toggle theme</span>
-                </Button>
-              </div>
               {user ? (
                 <>
                   <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-secondary">
@@ -165,6 +164,19 @@ export function Navbar() {
                       {user.displayName || user.email?.split('@')[0]}
                     </span>
                   </div>
+                  <Link 
+                    to="/cart" 
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-3 w-full px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
+                  >
+                    <ShoppingCart className="h-5 w-5" />
+                    <span className="flex-1">Cart</span>
+                    {items.length > 0 && (
+                       <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
+                         {items.length}
+                       </span>
+                    )}
+                  </Link>
                   <Button variant="outline" className="w-full" onClick={() => { handleLogout(); setIsOpen(false); }}>
                     <LogOut className="h-4 w-4 mr-2" />
                     Logout

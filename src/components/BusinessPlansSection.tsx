@@ -145,33 +145,33 @@ export const BusinessPlansSection = ({ previewMode = false }: BusinessPlansSecti
         {/* Toggle Tabs - Access Control: Only show if NOT in preview mode */}
         {!previewMode && (
           <div className="flex justify-center mb-12 animate-fade-up" style={{ animationDelay: "100ms" }}>
-            <div className="bg-secondary p-1 rounded-full inline-flex flex-wrap justify-center gap-2">
+            <div className="bg-secondary p-1.5 rounded-2xl sm:rounded-full flex flex-col sm:flex-row w-full sm:w-auto gap-2 sm:gap-0">
               <button
                 onClick={() => setActiveTab("business")}
-                className={`px-6 sm:px-8 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
+                className={`flex-1 sm:flex-none px-6 sm:px-8 py-3 rounded-xl sm:rounded-full text-sm font-medium transition-all duration-300 ${
                   activeTab === "business"
-                    ? "bg-foreground text-background shadow-lg"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-foreground text-background shadow-md transform sm:scale-105"
+                    : "text-muted-foreground hover:text-foreground hover:bg-background/50"
                 }`}
               >
                 Business Plans
               </button>
               <button
                 onClick={() => setActiveTab("content")}
-                className={`px-6 sm:px-8 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
+                className={`flex-1 sm:flex-none px-6 sm:px-8 py-3 rounded-xl sm:rounded-full text-sm font-medium transition-all duration-300 ${
                   activeTab === "content"
-                    ? "bg-foreground text-background shadow-lg"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-foreground text-background shadow-md transform sm:scale-105"
+                    : "text-muted-foreground hover:text-foreground hover:bg-background/50"
                 }`}
               >
                 Content Only Plans
               </button>
               <button
                 onClick={() => setActiveTab("custom")}
-                className={`px-6 sm:px-8 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
+                className={`flex-1 sm:flex-none px-6 sm:px-8 py-3 rounded-xl sm:rounded-full text-sm font-medium transition-all duration-300 ${
                   activeTab === "custom"
-                    ? "bg-foreground text-background shadow-lg"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-foreground text-background shadow-md transform sm:scale-105"
+                    : "text-muted-foreground hover:text-foreground hover:bg-background/50"
                 }`}
               >
                 Custom Packages
