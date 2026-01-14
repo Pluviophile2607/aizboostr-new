@@ -10,13 +10,13 @@ const videoSlots = [
 
 export function VideoAdsSection() {
   const [activeVideo, setActiveVideo] = useState<number | null>(null);
-  const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
+  const [hoveredVideo, setHoveredVideo] = useState<number | null>(null); // Now stores INDEX
   const [isPaused, setIsPaused] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
+  const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({}); // Key is INDEX
   const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -111,35 +111,41 @@ export function VideoAdsSection() {
     setTimeout(() => setIsPaused(false), 2000);
   };
 
-  const stopAllVideosExcept = (exceptId: number | null) => {
-    Object.entries(videoRefs.current).forEach(([id, video]) => {
-      if (video && Number(id) !== exceptId) {
+  const stopAllVideosExcept = (exceptIndex: number | null) => {
+    Object.entries(videoRefs.current).forEach(([index, video]) => {
+      if (video && Number(index) !== exceptIndex) {
         video.pause();
         video.currentTime = 0;
       }
     });
   };
 
-  const handleMouseEnter = (slotId: number, hasVideo: boolean) => {
+  const handleMouseEnter = (index: number, hasVideo: boolean) => {
     if (isTouchDevice) return;
     
-    setHoveredVideo(slotId);
+    setHoveredVideo(index);
     setIsPaused(true);
-    stopAllVideosExcept(slotId);
-    if (hasVideo && videoRefs.current[slotId]) {
-      const video = videoRefs.current[slotId]!;
+    stopAllVideosExcept(index);
+    if (hasVideo && videoRefs.current[index]) {
+      const video = videoRefs.current[index]!;
       video.muted = false; // Unmute on hover (user interaction)
-      video.play();
+      // Ensure promise handlng for play
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.log("Auto-play prevented:", error);
+        });
+      }
     }
   };
 
-  const handleMouseLeave = (slotId: number, hasVideo: boolean) => {
+  const handleMouseLeave = (index: number, hasVideo: boolean) => {
     if (isTouchDevice) return;
     
     setHoveredVideo(null);
     setIsPaused(false);
-    if (hasVideo && videoRefs.current[slotId]) {
-      const video = videoRefs.current[slotId]!;
+    if (hasVideo && videoRefs.current[index]) {
+      const video = videoRefs.current[index]!;
       video.pause();
       video.currentTime = 0;
       video.muted = true; // Re-mute when hover ends
@@ -198,16 +204,16 @@ export function VideoAdsSection() {
               <div
                 key={`${slot.id}-${index}`}
                 className={`flex-shrink-0 w-80 h-[450px] bg-card border border-border rounded-3xl overflow-hidden cursor-pointer transition-all duration-500 ease-out group ${
-                  hoveredVideo === slot.id ? "scale-105 shadow-2xl ring-2 ring-primary/20 z-10" : "hover:shadow-lg opacity-90 hover:opacity-100"
+                  hoveredVideo === index ? "scale-105 shadow-2xl ring-2 ring-primary/20 z-10" : "hover:shadow-lg opacity-90 hover:opacity-100"
                 }`}
-                onMouseEnter={() => handleMouseEnter(slot.id, !!slot.videoUrl)}
-                onMouseLeave={() => handleMouseLeave(slot.id, !!slot.videoUrl)}
+                onMouseEnter={() => handleMouseEnter(index, !!slot.videoUrl)}
+                onMouseLeave={() => handleMouseLeave(index, !!slot.videoUrl)}
                 onClick={() => handleClick(slot.id)}
               >
                 {slot.videoUrl ? (
                   <div className="relative w-full h-full">
                     <video
-                      ref={(el) => (videoRefs.current[slot.id] = el)}
+                      ref={(el) => (videoRefs.current[index] = el)}
                       className="w-full h-full object-cover"
                       loop
                       muted
@@ -217,7 +223,7 @@ export function VideoAdsSection() {
                     >
                       <source src={slot.videoUrl} type="video/mp4" />
                     </video>
-                    {hoveredVideo !== slot.id && (
+                    {hoveredVideo !== index && (
                       <div className="absolute inset-0 flex items-center justify-center bg-background/30">
                         <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center">
                           <Play className="h-8 w-8 text-foreground" />

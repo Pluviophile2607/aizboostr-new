@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Info } from "lucide-react";
+import { Info, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import GradientText from "./GradientText";
 import { PlanCard } from "./PlanCard";
@@ -122,18 +122,423 @@ const contentPlansData = [
   },
 ];
 
+const digitalFootprintPlansData = [
+  {
+    id: "insta-setup-mgmt",
+    name: "Instagram Setup & Management (Monthly)",
+    price: 1000,
+    description: "Profile optimization, bio setup, highlights, content strategy, and monthly management",
+    color: "pink",
+    features: [
+      { name: "Profile optimization", desc: "Complete account enhancement", value: "Included", color: "pink" },
+      { name: "Bio setup", desc: "Strategic & professional bio", value: "Included", color: "pink" },
+      { name: "Highlights", desc: "Cover creation & organization", value: "Included", color: "pink" },
+      { name: "Content strategy", desc: "Growth-focused planning", value: "Included", color: "pink" },
+      { name: "Monthly management", desc: "Ongoing execution & support", value: "Included", color: "pink" },
+    ],
+    discount: null,
+    gradient: "from-pink-500 via-rose-500 to-red-500",
+  },
+  {
+    id: "fb-setup-mgmt",
+    name: "Facebook Setup & Management (Monthly)",
+    price: 1000,
+    description: "Page creation, cover design, about section, business info setup, and monthly management",
+    color: "blue",
+    features: [
+      { name: "Page creation", desc: "Professional business page setup", value: "Included", color: "blue" },
+      { name: "Cover design", desc: "Custom branded cover image", value: "Included", color: "blue" },
+      { name: "About section", desc: "Detailed business information", value: "Included", color: "blue" },
+      { name: "Business info setup", desc: "Contact & location details", value: "Included", color: "blue" },
+      { name: "Monthly management", desc: "Regular updates & maintenance", value: "Included", color: "blue" },
+    ],
+    discount: null,
+    gradient: "from-blue-600 via-blue-500 to-cyan-500",
+  },
+  {
+    id: "linkedin-setup-mgmt",
+    name: "LinkedIn Setup & Management (Monthly)",
+    price: 1000,
+    description: "Company page creation, banner design, professional profile optimization, and monthly management",
+    color: "indigo",
+    features: [
+      { name: "Company page creation", desc: "Official business presence", value: "Included", color: "indigo" },
+      { name: "Banner design", desc: "Professional corporate header", value: "Included", color: "indigo" },
+      { name: "Profile optimization", desc: "SEO-friendly profile tuning", value: "Included", color: "indigo" },
+      { name: "Monthly management", desc: "Network engagement & updates", value: "Included", color: "indigo" },
+    ],
+    discount: null,
+    gradient: "from-indigo-600 via-blue-600 to-sky-500",
+  },
+  {
+    id: "twitter-setup-mgmt",
+    name: "Twitter/X Setup & Management (Monthly)",
+    price: 1000,
+    description: "Profile setup, header design, bio optimization, pinned tweet strategy, and monthly management",
+    color: "sky",
+    features: [
+      { name: "Profile setup", desc: "Account creation & configuration", value: "Included", color: "sky" },
+      { name: "Header design", desc: "Custom visual branding", value: "Included", color: "sky" },
+      { name: "Bio optimization", desc: "Impactful branding statement", value: "Included", color: "sky" },
+      { name: "Pinned tweet strategy", desc: "Key message highlighting", value: "Included", color: "sky" },
+      { name: "Monthly management", desc: "Active account monitoring", value: "Included", color: "sky" },
+    ],
+    discount: null,
+    gradient: "from-sky-500 via-blue-400 to-indigo-400",
+  },
+  {
+    id: "youtube-setup-mgmt",
+    name: "YouTube Setup & Management (Monthly)",
+    price: 1000,
+    description: "Channel creation, banner design, about section, video optimization, and monthly management",
+    color: "red",
+    features: [
+      { name: "Channel creation", desc: "Brand channel setup", value: "Included", color: "red" },
+      { name: "Banner design", desc: "Channel art & branding", value: "Included", color: "red" },
+      { name: "About section", desc: "Channel description & links", value: "Included", color: "red" },
+      { name: "Video optimization", desc: "SEO tags & settings", value: "Included", color: "red" },
+      { name: "Monthly management", desc: "Channel maintenance", value: "Included", color: "red" },
+    ],
+    discount: null,
+    gradient: "from-red-600 via-red-500 to-orange-500",
+  },
+  {
+    id: "gmb-setup",
+    name: "Google My Business Setup",
+    price: 2500,
+    description: "Complete GMB profile setup, photos, categories, and local SEO optimization",
+    color: "green",
+    features: [
+      { name: "Complete GMB profile", desc: "Full verification support", value: "Included", color: "green" },
+      { name: "Photos setup", desc: "Gallery organization", value: "Included", color: "green" },
+      { name: "Category selection", desc: "Accurate business categorization", value: "Included", color: "green" },
+      { name: "Local SEO optimization", desc: "Ranking improvement factors", value: "Included", color: "green" },
+    ],
+    discount: null,
+    gradient: "from-green-600 via-emerald-500 to-teal-500",
+  },
+  {
+    id: "gmb-management",
+    name: "Google My Business Management",
+    price: 7000,
+    description: "Monthly GMB management with updates, local SEO, rating management, and review responses",
+    color: "green",
+    features: [
+      { name: "Monthly management", desc: "Regular profile updates", value: "Included", color: "green" },
+      { name: "Local SEO updates", desc: "Continuous optimization", value: "Included", color: "green" },
+      { name: "Rating management", desc: "Reputation monitoring", value: "Included", color: "green" },
+      { name: "Review responses", desc: "Professional customer engagement", value: "Included", color: "green" },
+    ],
+    discount: null,
+    gradient: "from-green-500 via-teal-500 to-emerald-500",
+  },
+  {
+    id: "whatsapp-chatbot",
+    name: "WhatsApp Chat Bot for Your Brand",
+    price: 7000,
+    description: "Automated chatbot for WhatsApp to handle customer queries 24/7",
+    color: "green",
+    features: [
+      { name: "Automated chatbot", desc: "24/7 automated responses", value: "Included", color: "green" },
+      { name: "Customer queries", desc: "Instant query resolution", value: "Included", color: "green" },
+      { name: "Round the clock", desc: "Always-on availability", value: "Included", color: "green" },
+    ],
+    discount: null,
+    gradient: "from-green-400 via-emerald-400 to-teal-400",
+  },
+  {
+    id: "basic-landing-page",
+    name: "Basic Landing Page",
+    price: 5000,
+    description: "Single page website with contact form, responsive design, and basic SEO",
+    color: "purple",
+    features: [
+      { name: "Single page website", desc: "Clean & modern layout", value: "Included", color: "purple" },
+      { name: "Contact form", desc: "Lead capture integration", value: "Included", color: "purple" },
+      { name: "Responsive design", desc: "Mobile-friendly interface", value: "Included", color: "purple" },
+      { name: "Basic SEO", desc: "Search engine readiness", value: "Included", color: "purple" },
+    ],
+    discount: null,
+    gradient: "from-purple-600 via-violet-500 to-indigo-500",
+  },
+  {
+    id: "landing-page-domain",
+    name: "Landing Page + Domain",
+    price: 7500,
+    description: "Landing page with custom domain registration and 1-year hosting",
+    color: "purple",
+    features: [
+      { name: "Custom Landing Page", desc: "Tailored design", value: "Included", color: "purple" },
+      { name: "Domain registration", desc: ".com/.in or preferred TLD", value: "Included", color: "purple" },
+      { name: "1-year hosting", desc: "Reliable web hosting", value: "Included", color: "purple" },
+    ],
+    discount: null,
+    gradient: "from-violet-600 via-purple-500 to-fuchsia-500",
+  },
+  {
+    id: "advanced-website",
+    name: "Advanced Website",
+    price: 18000,
+    description: "Multi-page website with CMS, blog, SEO optimization, and analytics integration",
+    color: "orange",
+    features: [
+      { name: "Multi-page website", desc: "Comprehensive site structure", value: "Included", color: "orange" },
+      { name: "CMS integration", desc: "Easy content management", value: "Included", color: "orange" },
+      { name: "Blog setup", desc: "Content marketing platform", value: "Included", color: "orange" },
+      { name: "Advanced SEO", desc: "Deep optimization", value: "Included", color: "orange" },
+      { name: "Analytics", desc: "Traffic & behavior tracking", value: "Included", color: "orange" },
+    ],
+    discount: null,
+    gradient: "from-orange-600 via-amber-500 to-yellow-500",
+  },
+
+];
+
 interface BusinessPlansSectionProps {
   previewMode?: boolean;
 }
+
+const digitalContentPlansData = [
+  {
+    id: "pack-4-ads",
+    name: "Pack of 4 Ads (Up to 30 sec each)",
+    price: 10000,
+    description: "1 language included free. Additional language: ₹500 per ad (₹2000 total for pack)",
+    color: "orange",
+    features: [
+      { name: "4 Ad Videos", desc: "Up to 30 sec each", value: "Included", color: "orange" },
+      { name: "1 Language Free", desc: "Primary language included", value: "Included", color: "orange" },
+      { name: "Add'l Language", desc: "+₹500/ad (₹2k total)", value: "Optional", color: "orange" },
+    ],
+    discount: null,
+    gradient: "from-orange-500 via-amber-500 to-yellow-500",
+  },
+  {
+    id: "single-ad-15s",
+    name: "Single Ad Video (15 sec)",
+    price: 3000,
+    description: "1 language included free. Additional language: ₹500",
+    color: "pink",
+    features: [
+      { name: "1 Ad Video", desc: "15 sec duration", value: "Included", color: "pink" },
+      { name: "1 Language Free", desc: "Primary language included", value: "Included", color: "pink" },
+      { name: "Add'l Language", desc: "+₹500 for extra lang", value: "Optional", color: "pink" },
+    ],
+    discount: null,
+    gradient: "from-pink-500 via-rose-500 to-red-500",
+  },
+  {
+    id: "single-ad-30s",
+    name: "Single Ad Video (30 sec)",
+    price: 3500,
+    description: "1 language included free. Additional language: ₹500",
+    color: "purple",
+    features: [
+      { name: "1 Ad Video", desc: "30 sec duration", value: "Included", color: "purple" },
+      { name: "1 Language Free", desc: "Primary language included", value: "Included", color: "purple" },
+      { name: "Add'l Language", desc: "+₹500 for extra lang", value: "Optional", color: "purple" },
+    ],
+    discount: null,
+    gradient: "from-purple-500 via-violet-500 to-indigo-500",
+  },
+  {
+    id: "single-ad-above-30s",
+    name: "Single Ad Video (Above 30 sec)",
+    price: 5000,
+    description: "1 language included free. Additional language: ₹500",
+    color: "blue",
+    features: [
+      { name: "1 Ad Video", desc: "Above 30 sec duration", value: "Included", color: "blue" },
+      { name: "1 Language Free", desc: "Primary language included", value: "Included", color: "blue" },
+      { name: "Add'l Language", desc: "+₹500 for extra lang", value: "Optional", color: "blue" },
+    ],
+    discount: null,
+    gradient: "from-blue-500 via-cyan-500 to-teal-500",
+  },
+  {
+    id: "short-movie",
+    name: "Short Movie (Up to 5 minutes)",
+    price: 25000,
+    description: "Professional short movie with script, shooting, editing, and color grading",
+    color: "red",
+    features: [
+      { name: "5 min duration", desc: "Professional short film", value: "Included", color: "red" },
+      { name: "Script & Shooting", desc: "Full production support", value: "Included", color: "red" },
+      { name: "Editing & Color", desc: "Cinematic grading", value: "Included", color: "red" },
+    ],
+    discount: null,
+    gradient: "from-red-600 via-rose-600 to-pink-600",
+  },
+];
+
+const digitalReachPlansData = [
+  {
+    id: "one-week-boost",
+    name: "One-week Boost (1,000 reach)",
+    price: 1000,
+    description: "7-day paid promotion. 50% will be charged for maintenance of the boost campaign.",
+    color: "orange",
+    features: [
+      { name: "7-day paid promotion", desc: "Active for one week", value: "Included", color: "orange" },
+      { name: "1,000 reach", desc: "Estimated audience reach", value: "Included", color: "orange" },
+      { name: "Maintenance", desc: "50% charged for upkeep", value: "Included", color: "orange" },
+    ],
+    discount: null,
+    gradient: "from-orange-500 via-amber-500 to-yellow-500",
+  },
+  {
+    id: "package-4-boosts",
+    name: "Package of 4 Boosts",
+    price: 4000,
+    description: "4 weekly boosts - reach 4,000+ people. 50% will be charged for maintenance of the boost campaign.",
+    color: "orange",
+    features: [
+      { name: "4 weekly boosts", desc: "Consistent visibility", value: "Included", color: "orange" },
+      { name: "4,000+ reach", desc: "Estimated audience reach", value: "Included", color: "orange" },
+      { name: "Maintenance", desc: "50% charged for upkeep", value: "Included", color: "orange" },
+    ],
+    discount: null,
+    gradient: "from-orange-600 via-red-500 to-pink-500",
+  },
+  {
+    id: "whatsapp-broadcast",
+    name: "WhatsApp Broadcast",
+    price: 5000,
+    description: "Monthly WhatsApp broadcast campaigns to your customer list",
+    color: "green",
+    features: [
+      { name: "Monthly campaigns", desc: "Regular customer outreach", value: "Included", color: "green" },
+      { name: "Customer list", desc: "Targeted broadcasting", value: "Included", color: "green" },
+      { name: "Broadcast setup", desc: "Message formatting & sending", value: "Included", color: "green" },
+    ],
+    discount: null,
+    gradient: "from-green-500 via-emerald-500 to-teal-500",
+  },
+  {
+    id: "whatsapp-status-marketing",
+    name: "WhatsApp Status Marketing Software (U.S.P)",
+    price: 1000,
+    description: "₹1 per view (minimum 1000 views) - Automated WhatsApp status marketing. No discount applicable.",
+    color: "green",
+    features: [
+      { name: "Views", desc: "₹1/view (min 1k)", value: "₹1,000", color: "green", info: "Automated Status Views", isDynamic: true },
+    ],
+    discount: null,
+    gradient: "from-green-600 via-emerald-600 to-teal-600",
+    dynamicConfig: {
+      min: 1000,
+      max: 10000,
+      step: 100,
+      pricePerUnit: 1,
+      baseUnits: 1000,
+      unitName: "views"
+    }
+  },
+  {
+    id: "meta-google-boosting",
+    name: "Meta & Google Boosting",
+    price: 5000,
+    description: "Paid advertising on Meta & Google. 50% will be charged for maintenance of the campaign.",
+    color: "blue",
+    features: [
+      { name: "Paid advertising", desc: "Meta & Google Ads", value: "Included", color: "blue" },
+      { name: "Campaign management", desc: "Professional setup & optimization", value: "Included", color: "blue" },
+      { name: "Maintenance", desc: "50% charged for upkeep", value: "Included", color: "blue" },
+    ],
+    discount: null,
+    gradient: "from-blue-600 via-indigo-500 to-purple-500",
+  },
+];
+
+const aiAutomationPlansData = [
+  {
+    id: "lead-automation",
+    name: "Lead Automation",
+    price: 0,
+    description: "Automated lead nurturing with multi-channel follow-ups (WhatsApp Flow, Email)",
+    color: "purple",
+    badge: "Coming Soon",
+    features: [
+      { name: "Auto follow-up", desc: "Instant lead engagement", value: "Custom", color: "purple" },
+      { name: "WhatsApp Flow", desc: "Interactive chat flows", value: "Custom", color: "purple" },
+      { name: "Email sequences", desc: "Drip nurture campaigns", value: "Custom", color: "purple" },
+    ],
+    discount: "Custom Pricing",
+    gradient: "from-purple-600 via-violet-600 to-indigo-600",
+    disabled: true,
+  },
+  {
+    id: "crm-setup",
+    name: "CRM Setup",
+    price: 0,
+    description: "Complete CRM setup with sales pipeline, tagging, and automation",
+    color: "blue",
+    badge: "Coming Soon",
+    features: [
+      { name: "Pipeline setup", desc: "Visual sales stages", value: "Custom", color: "blue" },
+      { name: "Tagging system", desc: "Organized contact segmentation", value: "Custom", color: "blue" },
+      { name: "Automation rules", desc: "Workflow triggers", value: "Custom", color: "blue" },
+    ],
+    discount: "Custom Pricing",
+    gradient: "from-blue-600 via-cyan-600 to-teal-600",
+    disabled: true,
+  },
+  {
+    id: "workflow-automation",
+    name: "Workflow Automation",
+    price: 0,
+    description: "End-to-end workflow automation (Chatbot, Appointments, Payments)",
+    color: "orange",
+    badge: "Coming Soon",
+    features: [
+      { name: "Chatbot integration", desc: "24/7 automated support", value: "Custom", color: "orange" },
+      { name: "Appointment booking", desc: "Auto-scheduling system", value: "Custom", color: "orange" },
+      { name: "Payment automation", desc: "Seamless invoicing", value: "Custom", color: "orange" },
+    ],
+    discount: "Custom Pricing",
+    gradient: "from-orange-600 via-amber-600 to-yellow-600",
+    disabled: true,
+  },
+  {
+    id: "monthly-automation-maintenance",
+    name: "Monthly Automation Maintenance",
+    price: 0,
+    description: "Ongoing support and optimization of automation systems",
+    color: "green",
+    badge: "Coming Soon",
+    features: [
+      { name: "System health check", desc: "Regular performance monitoring", value: "Custom", color: "green" },
+      { name: "Optimization", desc: "Process improvements", value: "Custom", color: "green" },
+      { name: "Support", desc: "Priority troubleshooting", value: "Custom", color: "green" },
+    ],
+    discount: "Custom Pricing",
+    gradient: "from-green-600 via-emerald-600 to-teal-600",
+    disabled: true,
+  },
+];
 
 export const BusinessPlansSection = ({ previewMode = false }: BusinessPlansSectionProps) => {
   const [activeTab, setActiveTab] = useState<"business" | "content" | "custom">("business");
   const navigate = useNavigate();
 
   return (
-    <section className="py-24 px-4 sm:px-6 lg:px-8 bg-background">
+    <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-background">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12 animate-fade-up">
+        {!previewMode && (
+          <div className="absolute top-20 left-4 sm:left-8 z-40">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="gap-2 group bg-background/80 backdrop-blur-sm border border-border/50 shadow-sm sm:bg-transparent sm:border-0 sm:shadow-none rounded-full hover:bg-secondary/80 transition-all duration-300"
+              onClick={() => navigate("/")}
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              <span className="hidden sm:inline">Back to Home</span>
+              <span className="sm:hidden">Back</span>
+            </Button>
+          </div>
+        )}
+        <div className={`text-center mb-12 animate-fade-up ${!previewMode ? "mt-12 sm:mt-0" : ""}`}>
           <h2 className="text-4xl sm:text-5xl font-bold mb-4 text-foreground">
             Choose Your <span className="text-primary">Growth Plan</span>
           </h2>
@@ -234,19 +639,90 @@ export const BusinessPlansSection = ({ previewMode = false }: BusinessPlansSecti
           )}
 
           {!previewMode && activeTab === "custom" && (
-            <div className="text-center py-12 bg-card border border-border rounded-3xl">
-              <div className="mb-6">
-                 <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mx-auto mb-4">
-                   <Info className="w-8 h-8 text-foreground" />
-                 </div>
-                 <h3 className="text-2xl font-bold text-foreground mb-2">Build Your Own Package</h3>
-                 <p className="text-muted-foreground max-w-md mx-auto">
-                   Need something more specific? Connect with our team to create a custom plan tailored to your business goals.
-                 </p>
-              </div>
-              <Button variant="outline" size="lg" onClick={() => navigate("/custom-packages")}>
-                Configure Custom Package
-              </Button>
+            <div className="max-w-[1400px] mx-auto space-y-12">
+               
+               <div className="space-y-6">
+                  <div className="flex justify-center px-2">
+                    <GradientText
+                      colors={["#5227FF", "#FF9FFC", "#B19EEF", "#ff00d0", "#5227FF"]}
+                      animationSpeed={3}
+                      className="text-3xl font-bold m-5"
+                    >
+                      Digital Footprint Setup
+                    </GradientText>
+                  </div>
+                  <div className="grid grid-cols-1 gap-8 items-stretch place-content-center">
+                    {digitalFootprintPlansData.map((plan) => (
+                      <PlanCard key={plan.id} plan={plan} isCompact={true} orientation="horizontal" />
+                    ))}
+                  </div>
+               </div>
+
+               <div className="space-y-6">
+                  <div className="flex justify-center px-2">
+                    <GradientText
+                      colors={["#5227FF", "#FF9FFC", "#B19EEF", "#ff00d0", "#5227FF"]}
+                      animationSpeed={3}
+                      className="text-3xl font-bold m-5"
+                    >
+                      Digital Content Creation
+                    </GradientText>
+                  </div>
+                  <div className="grid grid-cols-1 gap-8 items-stretch place-content-center">
+                    {digitalContentPlansData.map((plan) => (
+                      <PlanCard key={plan.id} plan={plan} isCompact={true} orientation="horizontal" />
+                    ))}
+                  </div>
+               </div>
+
+               <div className="space-y-6">
+                  <div className="flex justify-center px-2">
+                    <GradientText
+                      colors={["#5227FF", "#FF9FFC", "#B19EEF", "#ff00d0", "#5227FF"]}
+                      animationSpeed={3}
+                      className="text-3xl font-bold m-5"
+                    >
+                      Digital Reach
+                    </GradientText>
+                  </div>
+                  <div className="grid grid-cols-1 gap-8 items-stretch place-content-center">
+                    {digitalReachPlansData.map((plan) => (
+                      <PlanCard key={plan.id} plan={plan} isCompact={true} orientation="horizontal" />
+                    ))}
+                  </div>
+               </div>
+
+               <div className="space-y-6">
+                  <div className="flex justify-center px-2">
+                    <GradientText
+                      colors={["#5227FF", "#FF9FFC", "#B19EEF", "#ff00d0", "#5227FF"]}
+                      animationSpeed={3}
+                      className="text-3xl font-bold m-5"
+                    >
+                      AI Automation Services
+                    </GradientText>
+                  </div>
+                  <div className="grid grid-cols-1 gap-8 items-stretch place-content-center">
+                    {aiAutomationPlansData.map((plan) => (
+                      <PlanCard key={plan.id} plan={plan} isCompact={true} orientation="horizontal" />
+                    ))}
+                  </div>
+               </div>
+
+              <div className="text-center py-12 bg-card border border-border rounded-3xl">
+                  <div className="mb-6">
+                     <div className="w-16 h-16 rounded-full bg-secondary flex items-center justify-center mx-auto mb-4">
+                       <Info className="w-8 h-8 text-foreground" />
+                     </div>
+                     <h3 className="text-2xl font-bold text-foreground mb-2">Build Your Own Package</h3>
+                     <p className="text-muted-foreground max-w-md mx-auto">
+                       Need something more specific? Connect with our team to create a custom plan tailored to your business goals.
+                     </p>
+                  </div>
+                  <Button variant="outline" size="lg" onClick={() => navigate("/custom-packages")}>
+                    Configure Custom Package
+                  </Button>
+                </div>
             </div>
           )}
         </div>

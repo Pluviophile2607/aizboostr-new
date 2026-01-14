@@ -18,6 +18,15 @@ interface PlanFeature {
   isDynamic?: boolean;
 }
 
+interface DynamicConfig {
+  min: number;
+  max: number;
+  step: number;
+  pricePerUnit: number;
+  baseUnits: number;
+  unitName: string;
+}
+
 interface PlanProps {
   id: string;
   name: string;
@@ -29,22 +38,32 @@ interface PlanProps {
   gradient: string;
   badge?: string;
   originalPrice?: number;
+  dynamicConfig?: DynamicConfig;
+  disabled?: boolean;
 }
 
-export const PlanCard = ({ plan }: { plan: PlanProps }) => {
-  const [viewCount, setViewCount] = useState(5000);
+export const PlanCard = ({ plan, isCompact = false, orientation = "vertical" }: { plan: PlanProps; isCompact?: boolean; orientation?: "vertical" | "horizontal" }) => {
+  const [viewCount, setViewCount] = useState(plan.dynamicConfig?.min || 5000);
   const [hasAddOn, setHasAddOn] = useState(false);
   const navigate = useNavigate();
   const { addToCart, removeFromCart, items } = useCart();
   const { toast } = useToast();
   const { user } = useAuth();
   
-  const additionalCost = Math.max(0, (viewCount - 5000) * 1);
+  const minViews = plan.dynamicConfig?.min || 5000;
+  const maxViews = plan.dynamicConfig?.max || 100000;
+  const step = plan.dynamicConfig?.step || 1000;
+  const pricePerUnit = plan.dynamicConfig?.pricePerUnit || 1;
+  const baseUnits = plan.dynamicConfig?.baseUnits || 5000;
+
+  const additionalCost = Math.max(0, (viewCount - baseUnits) * pricePerUnit);
   const dynamicPrice = plan.price + additionalCost;
   const cartItemId = `${plan.id}-${viewCount}${hasAddOn ? '-addon' : ''}`;
   const isSelected = items.some((item) => item.id === cartItemId);
 
   const handleToggleSelection = () => {
+    if (plan.disabled) return;
+    
     if (!user) {
       navigate("/auth");
       return;
@@ -87,33 +106,21 @@ export const PlanCard = ({ plan }: { plan: PlanProps }) => {
   };
 
   const handleAddOnToggle = () => {
-     if (!isSelected) return; // Only allow toggling if main plan is selected (though UI should hide it otherwise)
-     
-     // Remove current item (without addon)
-     removeFromCart(`${plan.id}-${viewCount}`);
-     
-     // Add new item (with addon)
-     // But wait, if we just update state and call addToCart, we need to be careful.
-     // Better strategy: Just toggle state, remove *current* ID from cart, and add *new* ID to cart.
-     
+     if (!isSelected) return;
      const newAddOnState = !hasAddOn;
      const oldId = `${plan.id}-${viewCount}${hasAddOn ? '-addon' : ''}`;
      const newId = `${plan.id}-${viewCount}${newAddOnState ? '-addon' : ''}`;
-     
      removeFromCart(oldId);
      setHasAddOn(newAddOnState);
-     
      const updatedFeatures = plan.features.map((f) => {
         if (f.isDynamic) {
           return `${viewCount.toLocaleString()} ${f.name}`;
         }
         return f.name;
       });
-
       if (newAddOnState) {
          updatedFeatures.push("Social Media Management (Add-On)");
       }
-     
      addToCart({
         id: newId,
         type: "fixed",
@@ -122,150 +129,150 @@ export const PlanCard = ({ plan }: { plan: PlanProps }) => {
         billingCycle: "month",
         features: updatedFeatures,
       });
-
       toast({
         title: newAddOnState ? "Add-On Added" : "Add-On Removed",
         description: `Social Media Management has been ${newAddOnState ? "added to" : "removed from"} your plan.`,
       });
   };
 
+  const commonFeatureRenderer = (feature: PlanFeature, idx: number) => {
+    const iconBgColor = feature.color === "primary" ? "bg-primary/10" : `bg-${feature.color}-500/10`;
+    const iconColor = feature.color === "primary" ? "text-primary" : `text-${feature.color}-500`;
+
+    let displayName = feature.name;
+    let displayValue = feature.value;
+
+    if (feature.isDynamic) {
+      displayName = `${viewCount.toLocaleString()} ${feature.name}`;
+      displayValue = `₹${viewCount.toLocaleString()} value`;
+    }
+
+    const isOptional = feature.name.includes("Optional");
+    if ((plan.id === "30-days-content" || plan.id === "30-days-content-part-2") && isOptional) {
+        displayValue = "+₹2,500"; 
+    }
+
+    return (
+      <div key={idx} className="flex flex-col gap-3">
+        <div className={`flex ${isCompact ? "gap-2" : "gap-3"}`}>
+          <div className={`mt-1 ${isCompact ? "w-5 h-5" : "w-6 h-6"} rounded-full ${iconBgColor} flex items-center justify-center flex-shrink-0`}>
+            <Check className={`${isCompact ? "w-3 h-3" : "w-4 h-4"} ${iconColor}`} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+                <p className={`font-medium ${isCompact ? "text-sm" : "text-base"} ${isOptional ? "text-primary font-bold bg-primary/10 px-2 py-0.5 rounded" : "text-foreground"}`}>
+                {displayName}
+              </p>
+              {feature.info && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info className="w-4 h-4 text-muted-foreground hover:text-foreground transition-colors" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{feature.info}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
+            <p className={`${isCompact ? "text-xs" : "text-sm"} text-muted-foreground`}>{feature.desc}</p>
+            {!isCompact && <p className="text-xs font-medium text-primary mt-0.5">{displayValue}</p>}
+          </div>
+        </div>
+        {feature.isDynamic && (
+          <div className="ml-9 mt-2 p-3 bg-secondary/30 rounded-lg border border-border/50">
+            <Slider
+              value={[viewCount]}
+              onValueChange={(val) => setViewCount(val[0])}
+              max={maxViews}
+              min={minViews}
+              step={step}
+              className="py-2 [&>span:first-child]:h-4 [&>span:last-child]:h-6 [&>span:last-child]:w-6"
+            />
+            <div className="flex justify-between items-center mt-2">
+              <span className="text-[10px] text-muted-foreground">{minViews >= 1000 ? `${minViews/1000}k` : minViews}</span>
+              <p className="text-[10px] text-muted-foreground text-center">+₹{pricePerUnit}/view</p>
+              <span className="text-[10px] text-muted-foreground">{maxViews >= 1000 ? `${maxViews/1000}k` : maxViews}</span>
+            </div>
+          </div>
+        )}
+        {(plan.id === "30-days-content" || plan.id === "30-days-content-part-2") && isOptional && isSelected && (
+            <div className="ml-9 mt-2 p-3 bg-primary/5 rounded-lg border border-primary/20 animate-fade-in">
+                <div className="flex justify-between items-center mb-2">
+                    <span className="font-semibold text-sm text-foreground">Social Media Management (Add-On)</span>
+                    <span className="font-bold text-sm text-primary">+₹2,500</span>
+                </div>
+                  <Button 
+                    variant={hasAddOn ? "default" : "outline"} 
+                    size="sm" 
+                    className="w-full text-xs h-8"
+                    onClick={handleAddOnToggle}
+                >
+                    {hasAddOn ? "Remove Add-On" : "Add This Service"}
+                </Button>
+            </div>
+        )}
+      </div>
+    );
+  };
 
   return (
-    <SpotlightCard key={plan.id} className={`bg-card border-border shadow-sm hover:shadow-xl transition-all duration-300 relative group flex flex-col lg:hover:scale-105 p-0 ${isSelected ? "ring-2 ring-primary" : ""}`}>
-      {/* ... existing badge and gradient code ... */}
+    <SpotlightCard key={plan.id} className={`bg-card border-border shadow-sm hover:shadow-xl transition-all duration-300 relative group flex lg:hover:scale-[1.02] p-0 ${isSelected ? "ring-2 ring-primary" : ""} ${orientation === "horizontal" ? "md:flex-row" : "flex-col"}`}>
       {plan.badge && (
         <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-bold px-3 py-1 rounded-bl-xl z-20">
           {plan.badge}
         </div>
       )}
-      <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${plan.gradient}`} />
+      <div className={`absolute top-0 left-0 ${orientation === "horizontal" ? "w-1 h-full" : "w-full h-1"} bg-gradient-to-${orientation === "horizontal" ? "b" : "r"} ${plan.gradient}`} />
 
-      <div className="px-4 py-6 flex flex-col h-full">
-        {/* ... existing header code ... */}
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h3 className="text-2xl font-bold text-foreground">{plan.name}</h3>
-            <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
-          </div>
+      <div className={`${isCompact ? "p-4" : "px-4 py-6"} flex ${orientation === "horizontal" ? "flex-col md:flex-row gap-6 w-full items-center" : "flex-col h-full"}`}>
+        
+        {/* Header Section */}
+        <div className={`${orientation === "horizontal" ? "w-full md:w-1/4 md:border-r md:border-border/50 md:pr-6" : ""}`}>
+            <div className="flex justify-between items-start mb-4">
+            <div>
+                <h3 className={`${isCompact ? "text-xl" : "text-2xl"} font-bold text-foreground`}>{plan.name}</h3>
+                <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
+            </div>
+            </div>
+            <div className={`${isCompact ? "mb-4 pb-4" : "mb-6 pb-6"} ${orientation === "horizontal" ? "border-b border-border/50 md:border-0 md:pb-0 md:mb-0" : "border-b border-border/50"}`}>
+            <div className="flex items-baseline gap-1">
+                <span className={`${isCompact ? "text-2xl" : "text-4xl"} font-bold text-foreground`}>₹{(dynamicPrice + (hasAddOn ? 2500 : 0)).toLocaleString()}</span>
+                <span className="text-muted-foreground text-base">/month</span>
+            </div>
+            {plan.originalPrice && (
+                <p className="text-sm text-muted-foreground mt-1">
+                Worth <span className="line-through decoration-red-500/50">₹{plan.originalPrice.toLocaleString()}</span>
+                </p>
+            )}
+            </div>
         </div>
 
-        <div className="mb-6 pb-6 border-b border-border/50">
-          <div className="flex items-baseline gap-1">
-            <span className="text-4xl font-bold text-foreground">₹{(dynamicPrice + (hasAddOn ? 2500 : 0)).toLocaleString()}</span>
-            <span className="text-muted-foreground text-base">/month</span>
-          </div>
-          {plan.originalPrice && (
-            <p className="text-sm text-muted-foreground mt-1">
-              Worth <span className="line-through decoration-red-500/50">₹{plan.originalPrice.toLocaleString()}</span>
-            </p>
-          )}
+        {/* Features Section */}
+        <div className={`${orientation === "horizontal" ? "flex-1 w-full" : "space-y-4 mb-8 flex-grow"}`}>
+            <div className={`${orientation === "horizontal" ? `grid gap-4 ${plan.features.length === 1 ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2"}` : `space-y-${isCompact ? "3" : "4"}`}`}>
+                {plan.features.map(commonFeatureRenderer)}
+            </div>
         </div>
 
-        <div className="space-y-4 mb-8 flex-grow">
-          {plan.features.map((feature, idx) => {
-            const iconBgColor = feature.color === "primary" ? "bg-primary/10" : `bg-${feature.color}-500/10`;
-            const iconColor = feature.color === "primary" ? "text-primary" : `text-${feature.color}-500`;
+        {/* Action Section */}
+        <div className={`${orientation === "horizontal" ? "w-full md:w-auto md:min-w-[150px] flex flex-col justify-center" : "mt-auto"}`}>
+            {plan.discount && (
+            <div className="p-3 bg-secondary/50 rounded-lg mb-6 border border-border/50">
+                <p className="text-xs text-muted-foreground text-center">{plan.discount}</p>
+            </div>
+            )}
 
-            let displayName = feature.name;
-            let displayValue = feature.value;
-
-            if (feature.isDynamic) {
-              displayName = `${viewCount.toLocaleString()} ${feature.name}`;
-              displayValue = `₹${viewCount.toLocaleString()} value`;
-            }
-
-            const isOptional = feature.name.includes("Optional");
-            
-            // Override display value for the add-on feature (Part 1 and Part 2)
-            if ((plan.id === "30-days-content" || plan.id === "30-days-content-part-2") && isOptional) {
-                displayValue = "+₹2,500"; 
-            }
-
-            return (
-              <div key={idx} className="flex flex-col gap-3">
-                <div className="flex gap-3">
-                  <div className={`mt-1 w-6 h-6 rounded-full ${iconBgColor} flex items-center justify-center flex-shrink-0`}>
-                    <Check className={`w-4 h-4 ${iconColor}`} />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                       <p className={`font-medium text-base ${isOptional ? "text-primary font-bold bg-primary/10 px-2 py-0.5 rounded" : "text-foreground"}`}>
-                        {displayName}
-                      </p>
-                      {feature.info && (
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Info className="w-4 h-4 text-muted-foreground hover:text-foreground transition-colors" />
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{feature.info}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground">{feature.desc}</p>
-                    <p className="text-xs font-medium text-primary mt-0.5">{displayValue}</p>
-                  </div>
-                </div>
-
-                {/* Render Slider if dynamic */}
-                {feature.isDynamic && (
-                  <div className="ml-9 mt-2 p-3 bg-secondary/30 rounded-lg border border-border/50">
-                    <Slider
-                      value={[viewCount]}
-                      onValueChange={(val) => setViewCount(val[0])}
-                      max={100000}
-                      min={5000}
-                      step={1000}
-                      className="py-2"
-                    />
-                    <div className="flex justify-between items-center mt-2">
-                      <span className="text-[10px] text-muted-foreground">5k</span>
-                      <p className="text-[10px] text-muted-foreground text-center">
-                        +₹1/view
-                      </p>
-                      <span className="text-[10px] text-muted-foreground">100k</span>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Render Add-On Option specifically for 30 Days Plan and Optional Feature */}
-                {(plan.id === "30-days-content" || plan.id === "30-days-content-part-2") && isOptional && isSelected && (
-                    <div className="ml-9 mt-2 p-3 bg-primary/5 rounded-lg border border-primary/20 animate-fade-in">
-                        <div className="flex justify-between items-center mb-2">
-                            <span className="font-semibold text-sm text-foreground">Social Media Management (Add-On)</span>
-                            <span className="font-bold text-sm text-primary">+₹2,500</span>
-                        </div>
-                         <Button 
-                            variant={hasAddOn ? "default" : "outline"} 
-                            size="sm" 
-                            className="w-full text-xs h-8"
-                            onClick={handleAddOnToggle}
-                        >
-                            {hasAddOn ? "Remove Add-On" : "Add This Service"}
-                        </Button>
-                    </div>
-                )}
-              </div>
-            );
-          })}
+            <Button 
+            className={`w-full ${isSelected ? "bg-green-600 hover:bg-green-700 text-white" : ""}`}
+            size={isCompact ? "sm" : "lg"}
+            onClick={handleToggleSelection}
+            disabled={plan.disabled}
+            >
+            {isSelected ? "Selected" : plan.disabled ? "Coming Soon" : "Select"}
+            </Button>
         </div>
-
-        {plan.discount && (
-          <div className="p-3 bg-secondary/50 rounded-lg mb-6 border border-border/50">
-            <p className="text-xs text-muted-foreground text-center">{plan.discount}</p>
-          </div>
-        )}
-
-        <Button 
-          className={`w-full mt-auto ${isSelected ? "bg-green-600 hover:bg-green-700 text-white" : ""}`}
-          size="lg" 
-          onClick={handleToggleSelection}
-        >
-          {isSelected ? "Selected" : "Select"}
-        </Button>
       </div>
     </SpotlightCard>
   );

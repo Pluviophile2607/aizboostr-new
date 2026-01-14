@@ -10,9 +10,9 @@ import GradientText from "./GradientText";
 import logo from "@/assets/aiz-logo.jpeg";
 
 const navLinks = [
-  { name: "Services", href: "/service/ai-automation", icon: Bot },
+
   { name: "Video Ads", href: "/service/video-ads", icon: Video },
-  { name: "Plans", href: "/custom-packages", icon: CreditCard },
+  { name: "Plans", href: "/business-plans", icon: CreditCard },
   { name: "Support", href: "/service/ai-marketing", icon: HeadphonesIcon },
 ];
 
@@ -118,7 +118,7 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile Theme Toggle & Menu Button */}
+          {/* Mobile Theme Toggle, Cart & Menu Button */}
           <div className="lg:hidden flex items-center gap-2">
             <Button
               variant="ghost"
@@ -130,6 +130,20 @@ export function Navbar() {
               <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
               <span className="sr-only">Toggle theme</span>
             </Button>
+            
+            {user && (
+              <Link to="/cart">
+                <Button variant="ghost" size="icon" className="relative w-9 h-9 rounded-full">
+                  <ShoppingCart className="h-5 w-5" />
+                  {items.length > 0 && (
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                      {items.length}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+            )}
+
             <button
               className="p-2 text-foreground"
               onClick={() => setIsOpen(!isOpen)}
@@ -164,19 +178,6 @@ export function Navbar() {
                       {user.displayName || user.email?.split('@')[0]}
                     </span>
                   </div>
-                  <Link 
-                    to="/cart" 
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-3 w-full px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-colors"
-                  >
-                    <ShoppingCart className="h-5 w-5" />
-                    <span className="flex-1">Cart</span>
-                    {items.length > 0 && (
-                       <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
-                         {items.length}
-                       </span>
-                    )}
-                  </Link>
                   <Button variant="outline" className="w-full" onClick={() => { handleLogout(); setIsOpen(false); }}>
                     <LogOut className="h-4 w-4 mr-2" />
                     Logout

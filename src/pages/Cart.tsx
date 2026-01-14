@@ -19,7 +19,8 @@ import {
 } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { CreditCard, Wallet } from "lucide-react";
+import { CreditCard, Wallet, QrCode, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Cart() {
   const { items, removeFromCart, cartTotal, clearCart } = useCart();
@@ -27,6 +28,9 @@ export default function Cart() {
   const [discountApplied, setDiscountApplied] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("razorpay");
+  const [paymentType, setPaymentType] = useState("full"); // 'full' or 'installment'
+  const [selectedReceipt, setSelectedReceipt] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
   const handleApplyCoupon = () => {
@@ -69,14 +73,17 @@ export default function Cart() {
   // Calculate totals
   const discountAmount = discountApplied ? cartTotal * 0.10 : 0;
   const finalTotal = cartTotal - discountAmount;
+  
+  // Calculate payable amount based on payment type
+  const payableAmount = paymentType === 'installment' ? finalTotal * 0.5 : finalTotal;
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     if (paymentMethod === 'razorpay') {
         setShowPaymentModal(false);
         
         const options = {
             key: "rzp_test_S3k05yVpTFOSID", // Enter the Key ID generated from the Dashboard
-            amount: finalTotal * 100, // Amount is in currency subunits. Default currency is INR.
+            amount: payableAmount * 100, // Amount is in currency subunits. Default currency is INR.
             currency: "INR",
             name: "AIZboostr",
             description: "Growth Plan Subscription",
@@ -114,6 +121,52 @@ export default function Cart() {
                 });
         });
         rzp1.open();
+    } else if (paymentMethod === 'qrcode') {
+        if (!selectedReceipt) {
+            toast({
+                variant: "destructive",
+                title: "Receipt Required",
+                description: "Please upload the payment receipt to proceed.",
+            });
+            return;
+        }
+        
+        setIsUploading(true);
+        try {
+            // Create a unique file name
+            const fileName = `receipts/${Date.now()}_${selectedReceipt.name}`;
+            
+            // Upload the file to Supabase Storage
+            const { data, error } = await supabase.storage
+                .from('receipts')
+                .upload(fileName, selectedReceipt);
+            
+            if (error) throw error;
+            
+            // Get the public URL
+            const { data: urlData } = supabase.storage
+                .from('receipts')
+                .getPublicUrl(fileName);
+            
+            console.log("Receipt uploaded:", urlData.publicUrl);
+            
+            toast({
+                title: "Payment Submitted",
+                description: "Once we verify your payment we'll send you the invoice.",
+            });
+            setShowPaymentModal(false);
+            clearCart();
+            setSelectedReceipt(null);
+        } catch (error) {
+            console.error("Upload error:", error);
+            toast({
+                variant: "destructive",
+                title: "Upload Failed",
+                description: "Failed to upload receipt. Please try again.",
+            });
+        } finally {
+            setIsUploading(false);
+        }
     } else {
         toast({
             title: "Processing Payment",
@@ -298,8 +351,31 @@ export default function Cart() {
               Choose how you want to pay for your plan.
             </DialogDescription>
           </DialogHeader>
+
           
-          <div className="py-6">
+          <div className="py-6 max-h-[60vh] overflow-y-auto px-1">
+            {/* Payment Type Selection */}
+            <div className="mb-6 space-y-3">
+                <Label className="text-base font-semibold">1. Choose Payment Schedule</Label>
+                <RadioGroup value={paymentType} onValueChange={setPaymentType} className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-2 border border-border p-3 rounded-lg bg-card hover:bg-secondary/50 cursor-pointer [&:has([data-state=checked])]:border-primary">
+                        <RadioGroupItem value="full" id="pay-full" />
+                        <Label htmlFor="pay-full" className="cursor-pointer flex-grow font-medium">
+                            Pay Full <br/>
+                            <span className="text-sm text-muted-foreground">₹{finalTotal.toLocaleString()}</span>
+                        </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 border border-border p-3 rounded-lg bg-card hover:bg-secondary/50 cursor-pointer [&:has([data-state=checked])]:border-primary">
+                        <RadioGroupItem value="installment" id="pay-installment" />
+                        <Label htmlFor="pay-installment" className="cursor-pointer flex-grow font-medium">
+                            50% Advance <br/>
+                            <span className="text-sm text-muted-foreground">₹{(finalTotal * 0.5).toLocaleString()}</span>
+                        </Label>
+                    </div>
+                </RadioGroup>
+            </div>
+
+            <Label className="text-base font-semibold mb-3 block">2. Select Payment Method</Label>
             <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="gap-4">
               <div className="flex items-center space-x-2 border border-border p-4 rounded-lg bg-card hover:bg-secondary/50 transition-colors cursor-pointer">
                 <RadioGroupItem value="razorpay" id="razorpay" />
@@ -315,12 +391,61 @@ export default function Cart() {
                   </div>
                 </Label>
               </div>
+
+              <div className="flex flex-col border border-border p-4 rounded-lg bg-card hover:bg-secondary/50 transition-colors cursor-pointer">
+                <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="qrcode" id="qrcode" />
+                    <Label htmlFor="qrcode" className="flex-grow cursor-pointer flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-purple-100 p-2 rounded-full">
+                            <QrCode className="w-5 h-5 text-purple-600" />
+                        </div>
+                        <div>
+                            <span className="font-semibold block">Pay via QR Code</span>
+                            <span className="text-xs text-muted-foreground">Scan & Pay Manually</span>
+                        </div>
+                    </div>
+                    </Label>
+                </div>
+                {paymentMethod === 'qrcode' && (
+                    <div className="mt-4 flex flex-col items-center justify-center animate-in slide-in-from-top-2 w-full">
+                        <img 
+                            src="/images/Qr-code.jpeg" 
+                            alt="Payment QR Code" 
+                            className="w-full max-w-sm h-auto object-contain rounded-lg border-2 border-primary/20 shadow-md mb-4"
+                        />
+                        <div className="w-full space-y-3">
+                            <p className="text-sm text-center font-medium">
+                                1. Scan & Pay <strong>₹{payableAmount.toLocaleString()}</strong>
+                            </p>
+                            <div className="space-y-2">
+                                <Label htmlFor="receipt" className="text-xs text-muted-foreground">2. Upload Payment Receipt</Label>
+                                <Input 
+                                    id="receipt" 
+                                    type="file" 
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        if (e.target.files && e.target.files[0]) {
+                                            setSelectedReceipt(e.target.files[0]);
+                                        }
+                                    }}
+                                    className="cursor-pointer"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
+              </div>
             </RadioGroup>
           </div>
 
           <div className="flex flex-col gap-3">
-            <Button size="lg" className="w-full" onClick={handlePayment}>
-              Pay ₹{finalTotal.toLocaleString()}
+            <Button size="lg" className="w-full" onClick={handlePayment} disabled={isUploading}>
+              {isUploading ? (
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Uploading...</>
+              ) : (
+                <>Pay ₹{payableAmount.toLocaleString()}</>
+              )}
             </Button>
             <Button variant="ghost" className="w-full" onClick={() => setShowPaymentModal(false)}>
               Cancel
