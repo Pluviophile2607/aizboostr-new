@@ -3,9 +3,9 @@ import { Play, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const videoSlots = [
-  { id: 1, title: "Demo 1", videoUrl: "/videos/demo-1.mp4" },
-  { id: 2, title: "Demo 2", videoUrl: "/videos/demo-2.mp4" },
-  { id: 3, title: "Demo 3", videoUrl: "/videos/demo-3.mp4" },
+  { id: 1, title: "AI Automation Demo", videoUrl: "/videos/demo-1.mp4", thumbnailUrl: "/images/thumbnails/demo-1.png" },
+  { id: 2, title: "AI Marketing Demo", videoUrl: "/videos/demo-2.mp4", thumbnailUrl: "/images/thumbnails/demo-2.png" },
+  { id: 3, title: "Brand Building Demo", videoUrl: "/videos/demo-3.mp4", thumbnailUrl: "/images/thumbnails/demo-3.png" },
 ];
 
 export function VideoAdsSection() {
@@ -127,7 +127,9 @@ export function VideoAdsSection() {
     setIsPaused(true);
     stopAllVideosExcept(slotId);
     if (hasVideo && videoRefs.current[slotId]) {
-      videoRefs.current[slotId]!.play();
+      const video = videoRefs.current[slotId]!;
+      video.muted = false; // Unmute on hover (user interaction)
+      video.play();
     }
   };
 
@@ -137,8 +139,10 @@ export function VideoAdsSection() {
     setHoveredVideo(null);
     setIsPaused(false);
     if (hasVideo && videoRefs.current[slotId]) {
-      videoRefs.current[slotId]!.pause();
-      videoRefs.current[slotId]!.currentTime = 0;
+      const video = videoRefs.current[slotId]!;
+      video.pause();
+      video.currentTime = 0;
+      video.muted = true; // Re-mute when hover ends
     }
   };
 
@@ -206,8 +210,10 @@ export function VideoAdsSection() {
                       ref={(el) => (videoRefs.current[slot.id] = el)}
                       className="w-full h-full object-cover"
                       loop
+                      muted
                       playsInline
                       preload="none"
+                      poster={slot.thumbnailUrl}
                     >
                       <source src={slot.videoUrl} type="video/mp4" />
                     </video>
