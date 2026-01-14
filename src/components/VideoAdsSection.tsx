@@ -6,13 +6,6 @@ const videoSlots = [
   { id: 1, title: "Demo 1", videoUrl: "/videos/demo-1.mp4" },
   { id: 2, title: "Demo 2", videoUrl: "/videos/demo-2.mp4" },
   { id: 3, title: "Demo 3", videoUrl: "/videos/demo-3.mp4" },
-  { id: 4, title: "Ad 4", videoUrl: null },
-  { id: 5, title: "Ad 5", videoUrl: null },
-  { id: 6, title: "Ad 6", videoUrl: null },
-  { id: 7, title: "Ad 7", videoUrl: null },
-  { id: 8, title: "Ad 8", videoUrl: null },
-  { id: 9, title: "Ad 9", videoUrl: null },
-  { id: 10, title: "Ad 10", videoUrl: null },
 ];
 
 export function VideoAdsSection() {
@@ -20,12 +13,11 @@ export function VideoAdsSection() {
   const [hoveredVideo, setHoveredVideo] = useState<number | null>(null);
   const [isPaused, setIsPaused] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStartX, setDragStartX] = useState(0);
-  const [scrollStartX, setScrollStartX] = useState(0);
-  const [hasDragged, setHasDragged] = useState(false);
+  const [isInView, setIsInView] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
+  const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
     const checkTouch = () => {
@@ -34,71 +26,74 @@ export function VideoAdsSection() {
     checkTouch();
   }, []);
 
+  // Intersection Observer - load videos only when section is visible
   useEffect(() => {
-    if (isPaused || activeVideo || isDragging) return;
-    
-    const interval = setInterval(() => {
-      if (containerRef.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = containerRef.current;
-        const maxScroll = scrollWidth - clientWidth;
-        
-        if (scrollLeft >= maxScroll - 5) {
-          containerRef.current.scrollTo({ left: 0, behavior: "smooth" });
-        } else {
-          containerRef.current.scrollBy({ left: 2, behavior: "auto" });
-        }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsInView(true);
+            // Load all videos when section comes into view
+            Object.values(videoRefs.current).forEach((video) => {
+              if (video && video.preload === 'none') {
+                video.preload = 'metadata';
+                video.load();
+              }
+            });
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Smooth infinite loop animation
+  useEffect(() => {
+    if (isPaused || activeVideo || !isInView) {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
       }
-    }, 30);
-
-    return () => clearInterval(interval);
-  }, [isPaused, activeVideo, isDragging]);
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!containerRef.current) return;
-    setIsDragging(true);
-    setHasDragged(false);
-    setDragStartX(e.pageX);
-    setScrollStartX(containerRef.current.scrollLeft);
-    setIsPaused(true);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !containerRef.current) return;
-    e.preventDefault();
-    const deltaX = e.pageX - dragStartX;
-    if (Math.abs(deltaX) > 5) {
-      setHasDragged(true);
+      return;
     }
-    containerRef.current.scrollLeft = scrollStartX - deltaX;
-  };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-    setTimeout(() => setIsPaused(false), 2000);
-  };
+    const container = containerRef.current;
+    if (!container) return;
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (!containerRef.current) return;
-    setIsDragging(true);
-    setHasDragged(false);
-    setDragStartX(e.touches[0].pageX);
-    setScrollStartX(containerRef.current.scrollLeft);
-    setIsPaused(true);
-  };
+    let scrollPos = container.scrollLeft;
+    const speed = 0.5; // pixels per frame
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || !containerRef.current) return;
-    const deltaX = e.touches[0].pageX - dragStartX;
-    if (Math.abs(deltaX) > 5) {
-      setHasDragged(true);
-    }
-    containerRef.current.scrollLeft = scrollStartX - deltaX;
-  };
+    const animate = () => {
+      if (!container) return;
+      
+      scrollPos += speed;
+      const cardWidth = 336; // 320px card + 16px gap
+      const singleSetWidth = cardWidth * videoSlots.length;
+      
+      // Reset to beginning seamlessly when reaching the duplicate set
+      if (scrollPos >= singleSetWidth) {
+        scrollPos = 0;
+        container.scrollLeft = 0;
+      } else {
+        container.scrollLeft = scrollPos;
+      }
 
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-    setTimeout(() => setIsPaused(false), 2000);
-  };
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [isPaused, activeVideo, isInView]);
 
   const scrollLeft = () => {
     setIsPaused(true);
@@ -126,7 +121,7 @@ export function VideoAdsSection() {
   };
 
   const handleMouseEnter = (slotId: number, hasVideo: boolean) => {
-    if (isTouchDevice || isDragging) return;
+    if (isTouchDevice) return;
     
     setHoveredVideo(slotId);
     setIsPaused(true);
@@ -147,14 +142,16 @@ export function VideoAdsSection() {
     }
   };
 
-  const handleClick = (slotId: number, hasVideo: boolean) => {
-    if (hasDragged) return;
+  const handleClick = (slotId: number) => {
     stopAllVideosExcept(null);
     setActiveVideo(slotId);
   };
 
+  // Duplicate videos for seamless infinite loop
+  const displaySlots = [...videoSlots, ...videoSlots, ...videoSlots];
+
   return (
-    <section id="video-ads-section" className="py-20 relative overflow-hidden bg-secondary">
+    <section ref={sectionRef} id="video-ads-section" className="py-20 relative overflow-hidden bg-secondary">
       <div className="max-w-full mx-auto">
         <div className="text-center mb-12 px-4">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-foreground">
@@ -187,29 +184,21 @@ export function VideoAdsSection() {
 
           <div 
             ref={containerRef}
-            className={`flex gap-6 overflow-x-auto pb-6 px-16 scrollbar-hide ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+            className="flex gap-4 overflow-x-hidden pb-6 px-16"
             style={{ 
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
-              userSelect: 'none',
             }}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
           >
-            {videoSlots.map((slot) => (
+            {displaySlots.map((slot, index) => (
               <div
-                key={slot.id}
-                className={`flex-shrink-0 w-80 h-[450px] bg-card border border-border rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 ${
+                key={`${slot.id}-${index}`}
+                className={`flex-shrink-0 w-80 h-[450px] bg-card border border-border rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 ease-in-out ${
                   hoveredVideo === slot.id ? "scale-105 shadow-xl z-10" : ""
                 }`}
                 onMouseEnter={() => handleMouseEnter(slot.id, !!slot.videoUrl)}
                 onMouseLeave={() => handleMouseLeave(slot.id, !!slot.videoUrl)}
-                onClick={() => handleClick(slot.id, !!slot.videoUrl)}
+                onClick={() => handleClick(slot.id)}
               >
                 {slot.videoUrl ? (
                   <div className="relative w-full h-full">
@@ -218,7 +207,7 @@ export function VideoAdsSection() {
                       className="w-full h-full object-cover"
                       loop
                       playsInline
-                      preload="metadata"
+                      preload="none"
                     >
                       <source src={slot.videoUrl} type="video/mp4" />
                     </video>
@@ -277,12 +266,6 @@ export function VideoAdsSection() {
           </div>
         )}
       </div>
-
-      <style>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </section>
   );
 }

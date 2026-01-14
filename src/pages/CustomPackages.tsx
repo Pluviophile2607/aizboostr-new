@@ -35,6 +35,7 @@ export default function CustomPackages() {
                 className="w-full h-full rounded-2xl object-cover"
                 controls
                 poster=""
+                preload="none"
               >
                 <source src="" type="video/mp4" />
                 <div className="flex flex-col items-center justify-center gap-4 text-muted-foreground">

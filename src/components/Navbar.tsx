@@ -1,15 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Bot, CreditCard, GraduationCap, Server, Sparkles, HeadphonesIcon } from "lucide-react";
+import { Menu, X, Bot, CreditCard, HeadphonesIcon, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/aiz-logo.jpeg";
 
 const navLinks = [
   { name: "Services", href: "/service/ai-automation", icon: Bot },
+  { name: "Video Ads", href: "/service/video-ads", icon: Video },
   { name: "Plans", href: "/custom-packages", icon: CreditCard },
-  { name: "AI Academy", href: "/service/ai-academy", icon: GraduationCap },
-  { name: "SaaS", href: "/service/saas-solutions", icon: Server },
-  { name: "AI Systems", href: "/service/ai-systems", icon: Sparkles },
   { name: "Support", href: "/service/ai-marketing", icon: HeadphonesIcon },
 ];
 
@@ -26,6 +24,7 @@ export function Navbar() {
               src={logo} 
               alt="AIZboostr" 
               className="h-12 w-auto mix-blend-multiply transition-transform duration-300 hover:scale-105"
+              loading="lazy"
             />
           </Link>
 

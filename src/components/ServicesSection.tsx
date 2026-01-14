@@ -1,4 +1,4 @@
-import { Bot, Megaphone, GraduationCap, Server, Sparkles, Zap, ArrowRight, Package } from "lucide-react";
+import { Bot, Megaphone, Sparkles, Zap, ArrowRight, Package } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const services = [
@@ -13,18 +13,6 @@ const services = [
     title: "AI Marketing",
     description: "Data-driven marketing campaigns powered by advanced AI analytics.",
     slug: "ai-marketing"
-  },
-  {
-    icon: GraduationCap,
-    title: "AI Academy",
-    description: "Learn to build and sell AI-powered courses with our comprehensive training.",
-    slug: "ai-academy"
-  },
-  {
-    icon: Server,
-    title: "SaaS Solutions",
-    description: "Custom software solutions built with cutting-edge AI technology.",
-    slug: "saas-solutions"
   },
   {
     icon: Sparkles,

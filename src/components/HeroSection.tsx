@@ -70,7 +70,8 @@ export function HeroSection() {
             <img 
               src={zedHero} 
               alt="ZED - AIZboostr Brand Ambassador" 
-              className="relative w-full max-w-lg mx-auto animate-float rounded-3xl" 
+              className="relative w-full max-w-lg mx-auto animate-float rounded-3xl"
+              loading="lazy"
             />
             {/* Floating badge */}
             <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-card border border-border px-6 py-3 rounded-full shadow-sm">

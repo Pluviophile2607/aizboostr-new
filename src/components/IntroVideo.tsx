@@ -12,7 +12,14 @@ const IntroVideo = ({ onComplete }: IntroVideoProps) => {
     if (video) {
       video.play().catch(console.error);
     }
-  }, []);
+
+    // Auto-complete after 2 seconds
+    const timer = setTimeout(() => {
+      onComplete();
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [onComplete]);
 
   const handleVideoEnd = () => {
     onComplete();

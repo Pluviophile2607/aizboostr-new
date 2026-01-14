@@ -6,8 +6,7 @@ const footerLinks = {
   Services: [
     { name: "AI Marketing", href: "#services" },
     { name: "AI Automation", href: "#services" },
-    { name: "SaaS Solutions", href: "#saas" },
-    { name: "AI Systems", href: "#systems" },
+    { name: "Video Ads", href: "#video-ads" },
   ],
   Company: [
     { name: "About Us", href: "#" },
@@ -16,17 +15,17 @@ const footerLinks = {
     { name: "Press", href: "#" },
   ],
   Resources: [
-    { name: "AI Academy", href: "#academy" },
     { name: "Documentation", href: "#" },
     { name: "API Reference", href: "#" },
     { name: "Community", href: "#" },
+    { name: "Support", href: "#support" },
   ],
-  Legal: [
-    { name: "Privacy Policy", href: "#" },
-    { name: "Terms of Service", href: "#" },
-    { name: "Cookie Policy", href: "#" },
-    { name: "GDPR", href: "#" },
-  ],
+  // Legal: [
+  //   { name: "Privacy Policy", href: "#" },
+  //   { name: "Terms of Service", href: "#" },
+  //   { name: "Cookie Policy", href: "#" },
+  //   { name: "GDPR", href: "#" },
+  // ],
 };
 
 const socialLinks = [
@@ -52,7 +51,7 @@ export function Footer() {
         <div className="grid md:grid-cols-2 lg:grid-cols-6 gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <img src={logo} alt="AIZboostr" className="h-12 w-auto mb-6" />
+            <img src={logo} alt="AIZboostr" className="h-12 w-auto mb-6" loading="lazy" />
             <p className="text-muted-foreground mb-6 max-w-xs">
               AI Powered Brand Building Brand. Transform your business with cutting-edge AI solutions.
             </p>
