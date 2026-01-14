@@ -197,8 +197,8 @@ export function VideoAdsSection() {
             {displaySlots.map((slot, index) => (
               <div
                 key={`${slot.id}-${index}`}
-                className={`flex-shrink-0 w-80 h-[450px] bg-card border border-border rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 ease-in-out ${
-                  hoveredVideo === slot.id ? "scale-105 shadow-xl z-10" : ""
+                className={`flex-shrink-0 w-80 h-[450px] bg-card border border-border rounded-3xl overflow-hidden cursor-pointer transition-all duration-500 ease-out group ${
+                  hoveredVideo === slot.id ? "scale-105 shadow-2xl ring-2 ring-primary/20 z-10" : "hover:shadow-lg opacity-90 hover:opacity-100"
                 }`}
                 onMouseEnter={() => handleMouseEnter(slot.id, !!slot.videoUrl)}
                 onMouseLeave={() => handleMouseLeave(slot.id, !!slot.videoUrl)}
@@ -235,12 +235,7 @@ export function VideoAdsSection() {
                   </div>
                 )}
                 
-                <div className="absolute bottom-0 left-0 right-0 bg-background border-t border-border p-4">
-                  <h4 className="font-semibold text-foreground">{slot.title}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {slot.videoUrl ? "Hover to play" : "Click to preview"}
-                  </p>
-                </div>
+
               </div>
             ))}
           </div>

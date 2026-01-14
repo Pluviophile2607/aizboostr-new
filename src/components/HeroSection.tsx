@@ -6,7 +6,7 @@ import zedHero from "@/assets/zed-hero-banner.png";
 export function HeroSection() {
   const navigate = useNavigate();
   const handleGetStarted = () => {
-    navigate("/auth?mode=signup");
+    navigate("/business-plans");
   };
   const handleWatchDemo = () => {
     const videoSection = document.getElementById("video-ads-section");

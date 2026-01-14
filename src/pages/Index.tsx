@@ -4,6 +4,7 @@ import { ServicesSection } from "@/components/ServicesSection";
 import { VideoAdsSection } from "@/components/VideoAdsSection";
 import { SupportSection } from "@/components/SupportSection";
 import { Footer } from "@/components/Footer";
+import { BusinessPlansSection } from "@/components/BusinessPlansSection";
 
 const Index = () => {
   return (
@@ -12,6 +13,7 @@ const Index = () => {
       <HeroSection />
       <ServicesSection />
       <VideoAdsSection />
+      <BusinessPlansSection previewMode={true} />
       <SupportSection />
       <Footer />
     </main>

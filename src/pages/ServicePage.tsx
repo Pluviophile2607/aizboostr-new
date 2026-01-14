@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, Navigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Bot, Megaphone, GraduationCap, Server, Sparkles, Zap, ArrowLeft } from "lucide-react";
@@ -52,6 +52,10 @@ const servicesData = {
 export default function ServicePage() {
   const { slug } = useParams();
   const service = servicesData[slug as keyof typeof servicesData];
+
+  if (slug === "video-ads") {
+    return <Navigate to="/video-ads" replace />;
+  }
 
   if (!service) {
     return (

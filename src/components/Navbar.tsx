@@ -3,6 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, Bot, CreditCard, HeadphonesIcon, Video, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "./theme-provider";
+import { useCart } from "@/context/CartContext";
+import { Moon, Sun, ShoppingCart } from "lucide-react";
+import GradientText from "./GradientText";
 import logo from "@/assets/aiz-logo.jpeg";
 
 const navLinks = [
@@ -14,6 +18,8 @@ const navLinks = [
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const { items } = useCart();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -28,12 +34,23 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <img 
-              src={logo} 
-              alt="AIZboostr" 
-              className="h-12 w-auto mix-blend-multiply transition-transform duration-300 hover:scale-105"
-              loading="lazy"
-            />
+            {theme === "dark" ? (
+              <GradientText
+                colors={["#5227FF", "#FF9FFC", "#B19EEF", "#ff00d0", "#5227FF"]}
+                animationSpeed={3}
+                className="text-2xl font-bold px-5 py-2"
+                showBorder={false}
+              >
+                AiZboostr
+              </GradientText>
+            ) : (
+              <img 
+                src={logo} 
+                alt="AIZboostr" 
+                className="h-12 w-auto mix-blend-multiply transition-transform duration-300 hover:scale-105"
+                loading="lazy"
+              />
+            )}
           </Link>
 
           {/* Desktop Navigation */}
@@ -52,6 +69,16 @@ export function Navbar() {
 
           {/* Auth Buttons - Show based on login state */}
           <div className="hidden lg:flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="rounded-full w-9 h-9"
+            >
+              <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
             {user ? (
               <>
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary">
@@ -64,6 +91,16 @@ export function Navbar() {
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
                 </Button>
+                <Link to="/cart">
+                  <Button variant="ghost" size="icon" className="relative">
+                    <ShoppingCart className="h-5 w-5" />
+                    {items.length > 0 && (
+                      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                        {items.length}
+                      </span>
+                    )}
+                  </Button>
+                </Link>
               </>
             ) : (
               <>
@@ -72,7 +109,7 @@ export function Navbar() {
                     Sign In
                   </Button>
                 </Link>
-                <Link to="/auth?mode=signup">
+                <Link to="/business-plans">
                   <Button variant="hero" size="sm">
                     Get Started
                   </Button>
@@ -107,6 +144,19 @@ export function Navbar() {
               </Link>
             ))}
             <div className="pt-4 flex flex-col gap-2">
+              <div className="flex items-center justify-between px-4 py-2">
+                <span className="text-sm font-medium text-muted-foreground">Theme</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="rounded-full w-9 h-9"
+                >
+                  <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                  <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  <span className="sr-only">Toggle theme</span>
+                </Button>
+              </div>
               {user ? (
                 <>
                   <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-secondary">
@@ -127,7 +177,7 @@ export function Navbar() {
                       Sign In
                     </Button>
                   </Link>
-                  <Link to="/auth?mode=signup" onClick={() => setIsOpen(false)}>
+                  <Link to="/business-plans" onClick={() => setIsOpen(false)}>
                     <Button variant="hero" className="w-full">
                       Get Started
                     </Button>

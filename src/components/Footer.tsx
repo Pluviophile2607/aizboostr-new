@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import { Twitter, Linkedin, Instagram, Youtube } from "lucide-react";
+import { useTheme } from "./theme-provider";
+import GradientText from "./GradientText";
 import logo from "@/assets/aizboostr-logo.png";
 
 const footerLinks = {
@@ -36,6 +38,7 @@ const socialLinks = [
 ];
 
 export function Footer() {
+  const { theme } = useTheme();
   const scrollToSection = (href: string) => {
     if (href.startsWith("#")) {
       const element = document.querySelector(href);
@@ -51,7 +54,20 @@ export function Footer() {
         <div className="grid md:grid-cols-2 lg:grid-cols-6 gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <img src={logo} alt="AIZboostr" className="h-12 w-auto mb-6" loading="lazy" />
+            {theme === "dark" ? (
+              <div className="mb-6">
+                <GradientText
+                  colors={["#5227FF", "#FF9FFC", "#B19EEF", "#ff00d0", "#5227FF"]}
+                  animationSpeed={3}
+                  className="text-2xl font-bold px-5 py-2"
+                  showBorder={false}
+                >
+                  AiZboostr
+                </GradientText>
+              </div>
+            ) : (
+              <img src={logo} alt="AIZboostr" className="h-12 w-auto mb-6" loading="lazy" />
+            )}
             <p className="text-muted-foreground mb-6 max-w-xs">
               AI Powered Brand Building Brand. Transform your business with cutting-edge AI solutions.
             </p>
