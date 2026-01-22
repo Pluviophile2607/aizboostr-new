@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://aizboostr-new-h97z.onrender.com',
+  baseURL: 'https://aizboostr-new.onrender.com',
 });
 
 // Add a request interceptor to attach the token
