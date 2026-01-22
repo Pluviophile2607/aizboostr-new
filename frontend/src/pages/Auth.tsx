@@ -52,6 +52,26 @@ export default function Auth() {
     setIsLoading(true);
     
     try {
+      // Check if admin credentials
+      if (!isSignUp && formData.email === 'aizadmin@aizboostr.com' && formData.password === 'aizadmin') {
+        // Store admin session
+        localStorage.setItem("adminAuth", JSON.stringify({ email: formData.email, role: 'admin' }));
+        
+        toast({
+          title: "Admin Login Successful",
+          description: "Redirecting to admin dashboard...",
+          className: "bg-green-600 text-white",
+        });
+        
+        // Redirect to admin dashboard
+        setTimeout(() => {
+          navigate("/admin/dashboard");
+        }, 1000);
+        setIsLoading(false);
+        return;
+      }
+      
+      // Regular user login/signup
       if (isSignUp) {
         await signUp(formData);
         setShowSuccessPopup(true);

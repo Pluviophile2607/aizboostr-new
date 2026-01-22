@@ -16,7 +16,7 @@ const IntroVideo = ({ onComplete }: IntroVideoProps) => {
     // Auto-complete after 2 seconds
     const timer = setTimeout(() => {
       onComplete();
-    }, 2000);
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, [onComplete]);
@@ -42,7 +42,7 @@ const IntroVideo = ({ onComplete }: IntroVideoProps) => {
         playsInline
         onEnded={handleVideoEnd}
       >
-        <source src="/intro-video.webm" type="video/webm" />
+        <source src="/intro-video.mp4" type="video/mp4" />
       </video>
       
       {/* Skip hint */}

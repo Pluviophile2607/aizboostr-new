@@ -126,16 +126,7 @@ const contentPlansData = [
 ];
 
 const digitalFootprintPlansData = [
-  {
-    id: "razorpay-demo",
-    name: "Demo for Razorpay",
-    price: 5,
-    description: "Test payment gateway integration with minimal amount",
-    color: "cyan",
-    features: [],
-    discount: null,
-    gradient: "from-cyan-500 via-blue-400 to-indigo-400",
-  },
+
   {
     id: "insta-setup-mgmt",
     name: "Instagram Setup & Management (Monthly)",

@@ -83,6 +83,17 @@
   html {
     scroll-behavior: smooth;
   }
+
+  /* Text selection colors */
+  ::selection {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  .dark ::selection {
+    background-color: #a855f7;
+    color: #ffffff;
+  }
 }
 
 @layer components {

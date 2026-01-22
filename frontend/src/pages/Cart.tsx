@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "@/api/axios";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -21,7 +21,6 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { CreditCard, Wallet, QrCode, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 import { useAuth } from "@/hooks/useAuth";
 
@@ -31,11 +30,27 @@ export default function Cart() {
   const [couponCode, setCouponCode] = useState("");
   const [discountApplied, setDiscountApplied] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("razorpay");
+  const [paymentMethod, setPaymentMethod] = useState("qrcode");
   const [paymentType, setPaymentType] = useState("full"); // 'full' or 'installment'
   const [selectedReceipt, setSelectedReceipt] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  
+  // Customer data form fields
+  const [customerName, setCustomerName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerContact, setCustomerContact] = useState("");
+  const [formErrors, setFormErrors] = useState<{name?: string; email?: string; contact?: string; receipt?: string}>({});
+  
   const { toast } = useToast();
+
+  // Initialize form fields when user data is available or modal opens
+  useEffect(() => {
+    if (user && showPaymentModal) {
+      setCustomerName(user.name || "");
+      setCustomerEmail(user.email || "");
+      setCustomerContact(user.mobileNumber || "");
+    }
+  }, [user, showPaymentModal]);
 
   const hasPendingPayment = user?.pendingPayment?.isPending;
   const pendingAmount = user?.pendingPayment?.amount || 0;
@@ -109,14 +124,59 @@ export default function Cart() {
 
   console.log("Payment Calc:", { hasPendingPayment, basePayablePaise, platformFeePaise, payableAmountPaise });
 
-  // Derived display values
   const discountAmount = discountAmountPaise / 100;
   const finalTotal = finalTotalPaise / 100;
   const platformFee = platformFeePaise / 100;
   const payableAmount = payableAmountPaise / 100;
 
+  // Form validation function
+  const validateForm = () => {
+    const errors: {name?: string; email?: string; contact?: string; receipt?: string} = {};
+    
+    // Validate name
+    if (!customerName.trim()) {
+      errors.name = "Name is required";
+    } else if (customerName.trim().length < 2) {
+      errors.name = "Name must be at least 2 characters";
+    }
+    
+    // Validate email
+    if (!customerEmail.trim()) {
+      errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
+      errors.email = "Please enter a valid email address";
+    }
+    
+    // Validate contact
+    if (!customerContact.trim()) {
+      errors.contact = "Contact number is required";
+    } else if (!/^[789]\d{9}$/.test(customerContact.trim())) {
+      errors.contact = "Please enter a valid 10-digit mobile number starting with 7, 8, or 9";
+    }
+    
+    // Validate receipt - now always required
+    if (!selectedReceipt) {
+      errors.receipt = "Payment receipt is required";
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+
   const handlePayment = async () => {
     console.log("Handle Payment triggered. Amount Paise:", payableAmountPaise);
+    
+    // Validate form before proceeding
+    if (!validateForm()) {
+      toast({
+        variant: "destructive",
+        title: "Form Validation Failed",
+        description: "Please fix the errors in the form before proceeding.",
+      });
+      return;
+    }
+    
     if (paymentMethod === 'razorpay') {
         if (!user) {
             toast({
@@ -158,9 +218,9 @@ export default function Cart() {
                     }
 
                     await api.post('/payment/save', {
-                        name: user.name,
-                        mobileNumber: user.mobileNumber,
-                        email: user.email,
+                        name: customerName,
+                        mobileNumber: customerContact,
+                        email: customerEmail,
                         amount: payableAmount,
                         productDetails: hasPendingPayment ? (user.pendingPayment?.productDetails || []) : items,
                         transactionId: response.razorpay_payment_id,
@@ -191,9 +251,9 @@ export default function Cart() {
                 }
             },
             prefill: {
-                name: user.name || "",
-                email: user.email || "",
-                contact: user.mobileNumber || ""
+                name: customerName || "",
+                email: customerEmail || "",
+                contact: customerContact || ""
             },
             notes: {
                 address: "AIZboostr Corporate Office"
@@ -234,55 +294,61 @@ export default function Cart() {
                 return;
             }
 
-            const fileName = `receipts/${Date.now()}_${selectedReceipt.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-            
-            const { data: uploadData, error: uploadError } = await supabase.storage
-                .from('receipts')
-                .upload(fileName, selectedReceipt);
-            
-            if (uploadError) throw uploadError;
-            
-            const { data: urlData } = supabase.storage
-                .from('receipts')
-                .getPublicUrl(fileName);
-            
-            const receiptUrl = urlData.publicUrl;
-            console.log("Receipt uploaded:", receiptUrl);
-
-            // Determine Payment Type for QR (Should probably match Razorpay logic)
+            // Determine Payment Type for QR
             let currentPaymentType = 'full';
-            // Note: DB structure for QR not full mapped yet in instructions, keeping basic insert
-            // But ideally we call /payment/save here too for consistency?
-            // Existing logic uses supabase directly. I will leave it be unless specific request.
-            // Just update amount logic implicitly via payableAmount variable use.
+            if (hasPendingPayment) {
+                currentPaymentType = 'clearance';
+            } else if (paymentType === 'installment') {
+                currentPaymentType = 'advance';
+            }
 
-            const { error: dbError } = await supabase
-                .from('orders')
-                .insert([
-                    {
-                        user_id: user.id, 
-                        receipt_url: receiptUrl,
-                        amount: payableAmount,
-                        payment_method: 'qrcode',
-                        status: 'pending'
-                    }
-                ]);
+            console.log("Uploading receipt to MongoDB...", {
+                name: customerName,
+                email: customerEmail,
+                amount: payableAmount,
+                paymentType: currentPaymentType,
+                fileName: selectedReceipt.name
+            });
 
-            if (dbError) throw dbError;
+            // Create FormData for file upload
+            const formData = new FormData();
+            formData.append('receiptImage', selectedReceipt);
+            formData.append('name', customerName || '');
+            formData.append('mobileNumber', customerContact || '');
+            formData.append('email', customerEmail || '');
+            formData.append('amount', payableAmount.toString());
+            formData.append('productDetails', JSON.stringify(
+                hasPendingPayment ? (user.pendingPayment?.productDetails || []) : items
+            ));
+            formData.append('paymentType', currentPaymentType);
+
+            // Upload to MongoDB backend
+            const response = await api.post('/payment/qr-payment', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            
+            console.log("MongoDB response:", response.data);
             
             toast({
                 title: "Payment Submitted",
-                description: "Your receipt has been uploaded and order placed. We will verify and notify you.",
+                description: "Your receipt has been uploaded and payment is pending verification.",
             });
             setShowPaymentModal(false);
             clearCart();
             setSelectedReceipt(null);
         } catch (error: any) {
             console.error("Order processing error:", error);
+            console.error("Error details:", {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status
+            });
             toast({
                 variant: "destructive",
                 title: "Processing Failed",
-                description: error.message || "Failed to process order. Please try again.",
+                description: error.response?.data?.message || error.message || "Failed to process order. Please try again.",
             });
         } finally {
             setIsUploading(false);
@@ -496,9 +562,81 @@ export default function Cart() {
 
           
           <div className="py-6 max-h-[60vh] overflow-y-auto px-1">
+            {/* Customer Information Form */}
+            <div className="mb-6 space-y-4 pb-4 border-b border-border">
+              <Label className="text-base font-semibold block mb-3">Customer Information</Label>
+              
+              <div className="space-y-2">
+                <Label htmlFor="customer-name" className="text-sm">Name *</Label>
+                <Input
+                  id="customer-name"
+                  placeholder="Enter your name"
+                  value={customerName}
+                  onChange={(e) => {
+                    setCustomerName(e.target.value);
+                    setFormErrors({...formErrors, name: undefined});
+                  }}
+                  className={formErrors.name ? "border-red-500" : ""}
+                />
+                {formErrors.name && (
+                  <p className="text-xs text-red-500">{formErrors.name}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="customer-email" className="text-sm">Email *</Label>
+                <Input
+                  id="customer-email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={customerEmail}
+                  onChange={(e) => {
+                    setCustomerEmail(e.target.value);
+                    setFormErrors({...formErrors, email: undefined});
+                  }}
+                  className={formErrors.email ? "border-red-500" : ""}
+                />
+                {formErrors.email && (
+                  <p className="text-xs text-red-500">{formErrors.email}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="customer-contact" className="text-sm">Contact Number *</Label>
+                <Input
+                  id="customer-contact"
+                  placeholder="10-digit mobile number"
+                  value={customerContact}
+                  onChange={(e) => {
+                    setCustomerContact(e.target.value);
+                    setFormErrors({...formErrors, contact: undefined});
+                  }}
+                  className={formErrors.contact ? "border-red-500" : ""}
+                  maxLength={10}
+                />
+                {formErrors.contact && (
+                  <p className="text-xs text-red-500">{formErrors.contact}</p>
+                )}
+              </div>
+
+              <div className="space-y-2 bg-secondary/30 p-3 rounded-lg">
+                <Label className="text-sm font-semibold">Product Details</Label>
+                <p className="text-xs text-muted-foreground">
+                  {hasPendingPayment 
+                    ? "Clearing pending payment"
+                    : items.map(item => item.name).join(", ")}
+                </p>
+              </div>
+
+              <div className="space-y-2 bg-secondary/30 p-3 rounded-lg">
+                <Label className="text-sm font-semibold">Payment Amount</Label>
+                <p className="text-lg font-bold">₹{payableAmount.toLocaleString()}</p>
+              </div>
+            </div>
+
             {/* Payment Type Selection */}
             <div className="mb-6 space-y-3">
-                <Label className="text-base font-semibold">1. Choose Payment Schedule</Label>
+                <Label className="text-base font-semibold">2. Choose Payment Schedule</Label>
                 <RadioGroup value={paymentType} onValueChange={setPaymentType} className="grid grid-cols-2 gap-4">
                     <div className="flex items-center space-x-2 border border-border p-3 rounded-lg bg-card hover:bg-secondary/50 cursor-pointer [&:has([data-state=checked])]:border-primary">
                         <RadioGroupItem value="full" id="pay-full" />
@@ -517,22 +655,9 @@ export default function Cart() {
                 </RadioGroup>
             </div>
 
-            <Label className="text-base font-semibold mb-3 block">2. Select Payment Method</Label>
+            <Label className="text-base font-semibold mb-3 block">3. Select Payment Method</Label>
             <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="gap-4">
-              <div className="flex items-center space-x-2 border border-border p-4 rounded-lg bg-card hover:bg-secondary/50 transition-colors cursor-pointer">
-                <RadioGroupItem value="razorpay" id="razorpay" />
-                <Label htmlFor="razorpay" className="flex-grow cursor-pointer flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-100 p-2 rounded-full">
-                        <CreditCard className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                        <span className="font-semibold block">Pay via Razorpay</span>
-                        <span className="text-xs text-muted-foreground">UPI, Cards, NetBanking</span>
-                    </div>
-                  </div>
-                </Label>
-              </div>
+              {/* Razorpay option temporarily removed */}
 
               <div className="flex flex-col border border-border p-4 rounded-lg bg-card hover:bg-secondary/50 transition-colors cursor-pointer">
                 <div className="flex items-center space-x-2">
@@ -556,29 +681,39 @@ export default function Cart() {
                             alt="Payment QR Code" 
                             className="w-full max-w-sm h-auto object-contain rounded-lg border-2 border-primary/20 shadow-md mb-4"
                         />
-                        <div className="w-full space-y-3">
-                            <p className="text-sm text-center font-medium">
-                                1. Scan & Pay <strong>₹{payableAmount.toLocaleString()}</strong>
-                            </p>
-                            <div className="space-y-2">
-                                <Label htmlFor="receipt" className="text-xs text-muted-foreground">2. Upload Payment Receipt</Label>
-                                <Input 
-                                    id="receipt" 
-                                    type="file" 
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                        if (e.target.files && e.target.files[0]) {
-                                            setSelectedReceipt(e.target.files[0]);
-                                        }
-                                    }}
-                                    className="cursor-pointer"
-                                />
-                            </div>
-                        </div>
+                        <p className="text-sm text-center font-medium">
+                            Scan & Pay <strong>₹{payableAmount.toLocaleString()}</strong>
+                        </p>
                     </div>
                 )}
               </div>
             </RadioGroup>
+            
+            {/* Receipt Upload Section */}
+            <div className="mt-6 space-y-3 border-t border-border pt-6">
+              <Label className="text-base font-semibold block">4. Upload Payment Receipt *</Label>
+              <p className="text-xs text-muted-foreground">
+                Screenshot of payment confirmation is required for verification.
+              </p>
+              <Input 
+                id="receipt-upload" 
+                type="file" 
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setSelectedReceipt(e.target.files[0]);
+                    setFormErrors({...formErrors, receipt: undefined});
+                  }
+                }}
+                className={`cursor-pointer ${formErrors.receipt ? "border-red-500" : ""}`}
+              />
+              {selectedReceipt && (
+                <p className="text-xs text-green-600">✓ {selectedReceipt.name} selected</p>
+              )}
+              {formErrors.receipt && (
+                <p className="text-xs text-red-500">{formErrors.receipt}</p>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-col gap-3">

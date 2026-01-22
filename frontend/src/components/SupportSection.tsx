@@ -9,6 +9,7 @@ const supportOptions = [
     description: "Send us a detailed message and we'll respond within 24 hours.",
     action: "Send Email",
     available: "Response in 24h",
+    email: "info@aizboostr.com",
   },
   {
     icon: Phone,
@@ -16,10 +17,9 @@ const supportOptions = [
     description: "Schedule a call with our support team for complex issues.",
     action: "Schedule Call",
     available: "Business Hours",
+    phone: "+919123456789",
   },
 ];
-
-
 
 export function SupportSection() {
   return (
@@ -48,8 +48,18 @@ export function SupportSection() {
               <h3 className="text-xl font-semibold mb-2 text-foreground">{option.title}</h3>
               <p className="text-muted-foreground mb-4">{option.description}</p>
               <div className="text-sm text-foreground font-medium mb-6">{option.available}</div>
-              <Button variant="outline" className="w-full">
-                {option.action}
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => {
+                  if (option.email) {
+                    window.location.href = `mailto:${option.email}`;
+                  } else if (option.phone) {
+                    window.location.href = `tel:${option.phone}`;
+                  }
+                }}
+              >
+                {option.email || option.action}
               </Button>
             </div>
           ))}

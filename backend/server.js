@@ -20,9 +20,11 @@ mongoose.connect(process.env.MONGODB_URI)
 // Routes
 const authRoutes = require('./routes/auth');
 const paymentRoutes = require('./routes/payment');
+const adminRoutes = require('./routes/admin');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/', (req, res) => {
   res.send('Backend is running');

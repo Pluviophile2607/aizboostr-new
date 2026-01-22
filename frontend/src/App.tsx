@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CompleteProfileModal } from "./components/CompleteProfileModal";
+import { FloatingCallButton } from "./components/FloatingCallButton";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CartProvider } from "@/context/CartContext";
@@ -15,6 +16,7 @@ import CustomPackages from "./pages/CustomPackages";
 import VideoAds from "./pages/VideoAds";
 import BusinessPlans from "./pages/BusinessPlans";
 import Cart from "./pages/Cart";
+import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import IntroVideo from "./components/IntroVideo";
@@ -47,6 +49,7 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <FloatingCallButton />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
@@ -56,7 +59,8 @@ const App = () => {
                 <Route path="/video-ads" element={<VideoAds />} />
                 <Route path="/business-plans" element={<BusinessPlans />} />
                 <Route path="/cart" element={<Cart />} />
-                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

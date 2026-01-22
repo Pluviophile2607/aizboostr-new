@@ -84,7 +84,7 @@ export function Navbar() {
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary">
                   <User className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm font-medium text-foreground">
-                    {user.displayName || user.email?.split('@')[0]}
+                    {user.name || user.email?.split('@')[0]}
                   </span>
                 </div>
                 <Button variant="ghost" size="sm" onClick={handleLogout}>
@@ -175,7 +175,7 @@ export function Navbar() {
                   <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-secondary">
                     <User className="h-5 w-5 text-muted-foreground" />
                     <span className="font-medium text-foreground">
-                      {user.displayName || user.email?.split('@')[0]}
+                      {user.name || user.email?.split('@')[0]}
                     </span>
                   </div>
                   <Button variant="outline" className="w-full" onClick={() => { handleLogout(); setIsOpen(false); }}>
