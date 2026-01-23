@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useGoogleLogin } from "@react-oauth/google";
+import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { auth, googleProvider } from "@/integrations/firebase/client";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, User, ArrowLeft, Eye, EyeOff, CheckCircle, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -111,27 +112,31 @@ export default function Auth() {
     }
   };
 
-  const handleGoogleSignIn = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-        try {
-            await signInWithGoogle(tokenResponse.access_token);
+  const handleGoogleSignIn = async () => {
+    try {
+        const result = await signInWithPopup(auth, googleProvider);
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential?.accessToken;
+
+        if (token) {
+            await signInWithGoogle(token);
             setShowLoginSuccess(true);
-        } catch (error: any) {
-            toast({
+        } else {
+             toast({
                 title: "Error",
-                description: error.response?.data?.message || "Failed to sign in with Google",
+                description: "Could not retrieve Google Access Token",
                 variant: "destructive",
             });
         }
-    },
-    onError: () => {
+    } catch (error: any) {
+        console.error("Google Sign-In Error:", error);
         toast({
             title: "Error",
-            description: "Google Login Failed",
+            description: error.message || "Failed to sign in with Google",
             variant: "destructive",
         });
     }
-  });
+  };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -263,7 +268,7 @@ export default function Auth() {
 
           {/* Google Sign In */}
           <button
-            onClick={() => handleGoogleSignIn()}
+            onClick={handleGoogleSignIn}
             className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-border bg-background/50 hover:bg-secondary/80 rounded-xl transition-all mb-6 group"
           >
             <svg className="h-5 w-5 transition-transform group-hover:scale-110" viewBox="0 0 24 24">

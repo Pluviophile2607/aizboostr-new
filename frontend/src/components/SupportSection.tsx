@@ -17,7 +17,7 @@ const supportOptions = [
     description: "Schedule a call with our support team for complex issues.",
     action: "Schedule Call",
     available: "Business Hours",
-    phone: "+919123456789",
+    phone: "++919892489040",
   },
 ];
 
