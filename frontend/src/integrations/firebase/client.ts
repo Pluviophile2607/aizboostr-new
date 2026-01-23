@@ -19,6 +19,10 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
+// Add scopes to ensure access token is returned
+googleProvider.addScope('profile');
+googleProvider.addScope('email');
+
 // Initialize Firebase Storage
 export const storage = getStorage(app);
 
