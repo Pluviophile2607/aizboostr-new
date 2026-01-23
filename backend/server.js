@@ -9,7 +9,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-    origin: ['https://aizboostr.com', 'https://www.aizboostr.com', 'https://aizboostr-brand-brilliance.vercel.app', 'http://localhost:5173', 'http://localhost:8080'],
+    origin: ['https://aizboostr.com', 'https://www.aizboostr.com', 'https://aizboostr-brand-brilliance.vercel.app', 'http://localhost:5173', 'http://localhost:8080','https://us.cloudlogin.co'],
     credentials: true
 }));
 app.use(express.json());
