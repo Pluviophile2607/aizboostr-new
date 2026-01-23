@@ -26,7 +26,7 @@ export function SupportSection() {
     <section id="support" className="py-16 relative bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8 space-y-4">
-          <h2 className="text-4xl sm:text-5xl font-bold text-foreground">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground">
             We're Here to
             <span className="text-foreground"> Help</span>
           </h2>

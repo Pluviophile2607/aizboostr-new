@@ -7,7 +7,7 @@ import { useTheme } from "./theme-provider";
 import { useCart } from "@/context/CartContext";
 import { Moon, Sun, ShoppingCart } from "lucide-react";
 import GradientText from "./GradientText";
-import logo from "@/assets/aiz-logo.jpeg";
+const logo = "https://ik.imagekit.io/pluviophile/New%20Folder/aiz-logo.jpeg";
 
 const navLinks = [
 
@@ -29,7 +29,7 @@ export function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-xl border-b border-white/10 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -156,7 +156,7 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="lg:hidden bg-background border-b border-border">
+        <div className="lg:hidden bg-background/80 backdrop-blur-xl border-b border-white/10">
           <div className="px-4 py-4 space-y-2">
             {navLinks.map((link) => (
               <Link

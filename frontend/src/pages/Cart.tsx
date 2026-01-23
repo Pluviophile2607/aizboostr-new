@@ -677,7 +677,7 @@ export default function Cart() {
                 {paymentMethod === 'qrcode' && (
                     <div className="mt-4 flex flex-col items-center justify-center animate-in slide-in-from-top-2 w-full">
                         <img 
-                            src="/images/Qr-code.jpeg" 
+                            src="https://ik.imagekit.io/pluviophile/New%20Folder/images/Qr-code.jpeg" 
                             alt="Payment QR Code" 
                             className="w-full max-w-sm h-auto object-contain rounded-lg border-2 border-primary/20 shadow-md mb-4"
                         />

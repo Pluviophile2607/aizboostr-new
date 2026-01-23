@@ -2,7 +2,7 @@ import { ArrowRight, Play, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import zedAvatar from "/videos/zed-avtar.webm";
+const zedAvatar = "https://ik.imagekit.io/pluviophile/New%20Folder/videos/zed-avtar.webm";
 
 export function HeroSection() {
   const navigate = useNavigate();
@@ -62,7 +62,7 @@ export function HeroSection() {
               <span className="text-sm font-medium text-foreground">AI-Powered Brand Building</span>
             </div>
             
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-tight">
               Build Your<br />
               Brand with<br />
               <span className="text-foreground">AIZBOOSTR</span>
@@ -91,7 +91,7 @@ export function HeroSection() {
           {/* ZED Character - Right on desktop, below on mobile */}
           <div className="relative animate-scale-in flex justify-center lg:justify-center">
             {/* Constrained Wrapper for relative positioning over video */}
-            <div className="relative" style={{ width: '340px', height: '604px' }}>
+            <div className="relative w-full max-w-[280px] sm:max-w-[340px] aspect-[9/16]">
               <video 
                 ref={videoRef}
                 src={zedAvatar} 

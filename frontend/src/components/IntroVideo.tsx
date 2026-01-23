@@ -16,7 +16,7 @@ const IntroVideo = ({ onComplete }: IntroVideoProps) => {
     // Auto-complete after 2 seconds
     const timer = setTimeout(() => {
       onComplete();
-    }, 2500);
+    }, 2800);
 
     return () => clearTimeout(timer);
   }, [onComplete]);
@@ -42,7 +42,7 @@ const IntroVideo = ({ onComplete }: IntroVideoProps) => {
         playsInline
         onEnded={handleVideoEnd}
       >
-        <source src="/intro-video.mp4" type="video/mp4" />
+        <source src="https://ik.imagekit.io/pluviophile/New%20Folder/intro-video.mp4?updatedAt=1769189957948" type="video/mp4" />
       </video>
       
       {/* Skip hint */}

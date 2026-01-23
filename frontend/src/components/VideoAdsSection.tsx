@@ -5,12 +5,12 @@ import { Play, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const videoSlots = [
-  { id: 1, title: "AI Automation Demo", videoUrl: "/videos/demo-1.webm", thumbnailUrl: "/images/thumbnails/demo-1.png" },
-  { id: 2, title: "AI Marketing Demo", videoUrl: "/videos/demo-2.webm", thumbnailUrl: "/images/thumbnails/demo-2.png" },
-  { id: 3, title: "Brand Building Demo", videoUrl: "/videos/demo-3.webm", thumbnailUrl: "/images/thumbnails/demo-3.png" },
-  { id: 4, title: "Content Creation Demo", videoUrl: "/videos/demo-4.webm", thumbnailUrl: "/images/thumbnails/demo-4.png" },
-  { id: 5, title: "Social Media Demo", videoUrl: "/videos/demo-5.webm", thumbnailUrl: "/images/thumbnails/demo-5.png" },
-  { id: 6, title: "Growth Strategy Demo", videoUrl: "/videos/demo-6.webm", thumbnailUrl: "/images/thumbnails/demo-6.png" },
+  { id: 1, title: "AI Automation Demo", videoUrl: "https://ik.imagekit.io/pluviophile/New%20Folder/videos/demo-1.webm", thumbnailUrl: "/images/thumbnails/demo-1.png" },
+  { id: 2, title: "AI Marketing Demo", videoUrl: "https://ik.imagekit.io/pluviophile/New%20Folder/videos/demo-2.webm", thumbnailUrl: "/images/thumbnails/demo-2.png" },
+  { id: 3, title: "Brand Building Demo", videoUrl: "https://ik.imagekit.io/pluviophile/New%20Folder/videos/demo-3.webm", thumbnailUrl: "/images/thumbnails/demo-3.png" },
+  { id: 4, title: "Content Creation Demo", videoUrl: "https://ik.imagekit.io/pluviophile/New%20Folder/videos/demo-4.webm", thumbnailUrl: "/images/thumbnails/demo-4.png" },
+  { id: 5, title: "Social Media Demo", videoUrl: "https://ik.imagekit.io/pluviophile/New%20Folder/videos/demo-5.webm", thumbnailUrl: "/images/thumbnails/demo-5.png" },
+  { id: 6, title: "Growth Strategy Demo", videoUrl: "https://ik.imagekit.io/pluviophile/New%20Folder/videos/demo-6.webm", thumbnailUrl: "/images/thumbnails/demo-6.png" },
 ];
 
 export function VideoAdsSection() {
@@ -55,7 +55,7 @@ export function VideoAdsSection() {
             {videoSlots.map((slot) => (
               <div
                 key={slot.id}
-                className="flex-shrink-0 w-80 h-[450px] relative group cursor-pointer"
+                className="flex-shrink-0 w-64 sm:w-80 h-[380px] sm:h-[450px] relative group cursor-pointer"
                 onClick={() => handleClick(slot.id)}
               >
                 <div className="w-full h-full bg-card border border-border rounded-3xl overflow-hidden transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl relative">
