@@ -7,7 +7,7 @@ import { useTheme } from "./theme-provider";
 import { useCart } from "@/context/CartContext";
 import { Moon, Sun, ShoppingCart } from "lucide-react";
 import GradientText from "./GradientText";
-const logo = "https://ik.imagekit.io/pluviophile/New%20Folder/aiz-logo.jpeg";
+const logo = "https://cdn.designfast.io/image/2026-01-23/65dae496-1d36-49d7-8c86-12bd2553c489.jpeg";
 
 const navLinks = [
 

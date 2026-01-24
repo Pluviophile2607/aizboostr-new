@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Instagram, Youtube } from "lucide-react";
 import { useTheme } from "./theme-provider";
 import GradientText from "./GradientText";
-const logo = "https://ik.imagekit.io/pluviophile/New%20Folder/aiz-logo.jpeg";
+const logo = "https://cdn.designfast.io/image/2026-01-23/65dae496-1d36-49d7-8c86-12bd2553c489.jpeg";
 
 const footerLinks = {
   Services: [

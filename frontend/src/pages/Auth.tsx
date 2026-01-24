@@ -6,7 +6,7 @@ import { Mail, Lock, User, ArrowLeft, Eye, EyeOff, CheckCircle, Phone } from "lu
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-const logo = "https://ik.imagekit.io/pluviophile/New%20Folder/aiz-logo.jpeg";
+const logo = "https://cdn.designfast.io/image/2026-01-23/65dae496-1d36-49d7-8c86-12bd2553c489.jpeg";
 import {
   Dialog,
   DialogContent,
