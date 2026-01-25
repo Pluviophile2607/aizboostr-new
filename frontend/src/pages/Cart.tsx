@@ -131,6 +131,11 @@ export default function Cart() {
 
   // Form validation function
   const validateForm = () => {
+    // Skip validation for Razorpay if we are trusting logged-in user or just don't need manual form
+    if (paymentMethod === 'razorpay') {
+        return true;
+    }
+
     const errors: {name?: string; email?: string; contact?: string; receipt?: string} = {};
     
     // Validate name
@@ -154,8 +159,8 @@ export default function Cart() {
       errors.contact = "Please enter a valid 10-digit mobile number starting with 7, 8, or 9";
     }
     
-    // Validate receipt - now always required
-    if (!selectedReceipt) {
+    // Validate receipt - ONLY if Qrcode
+    if (paymentMethod === 'qrcode' && !selectedReceipt) {
       errors.receipt = "Payment receipt is required";
     }
     
@@ -589,9 +594,81 @@ export default function Cart() {
 
           
           <div className="py-6 max-h-[60vh] overflow-y-auto px-1">
-            {/* Customer Information Form */}
-            <div className="mb-6 space-y-4 pb-4 border-b border-border">
-              <Label className="text-base font-semibold block mb-3">Customer Information</Label>
+            
+            <Label className="text-base font-semibold mb-3 block">1. Select Payment Method</Label>
+            <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="gap-4 mb-6">
+              <div className={`flex flex-col border p-4 rounded-lg transition-colors cursor-pointer ${paymentMethod === 'razorpay' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:bg-secondary/50'}`}>
+                <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="razorpay" id="razorpay" />
+                    <Label htmlFor="razorpay" className="flex-grow cursor-pointer flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-blue-100 p-2 rounded-full">
+                            <CreditCard className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <div>
+                            <span className="font-semibold block">Pay via Razorpay</span>
+                            <span className="text-xs text-muted-foreground">Credit/Debit Card, UPI, NetBanking</span>
+                        </div>
+                    </div>
+                    </Label>
+                </div>
+              </div>
+
+              <div className={`flex flex-col border p-4 rounded-lg transition-colors cursor-pointer ${paymentMethod === 'qrcode' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:bg-secondary/50'}`}>
+                <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="qrcode" id="qrcode" />
+                    <Label htmlFor="qrcode" className="flex-grow cursor-pointer flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-purple-100 p-2 rounded-full">
+                            <QrCode className="w-5 h-5 text-purple-600" />
+                        </div>
+                        <div>
+                            <span className="font-semibold block">Pay via QR Code</span>
+                            <span className="text-xs text-muted-foreground">Scan & Pay Manually</span>
+                        </div>
+                    </div>
+                    </Label>
+                </div>
+                {paymentMethod === 'qrcode' && (
+                    <div className="mt-4 flex flex-col items-center justify-center animate-in slide-in-from-top-2 w-full">
+                        <img 
+                            src="https://cdn.designfast.io/image/2026-01-23/39481c7a-457d-49f4-b132-8c9167ada421.jpeg" 
+                            alt="Payment QR Code" 
+                            className="w-full max-w-sm h-auto object-contain rounded-lg border-2 border-primary/20 shadow-md mb-4"
+                        />
+                        <p className="text-sm text-center font-medium">
+                            Scan & Pay <strong>₹{payableAmount.toLocaleString()}</strong>
+                        </p>
+                    </div>
+                )}
+              </div>
+            </RadioGroup>
+
+            {/* Payment Type Selection */}
+            <div className="mb-6 space-y-3">
+                <Label className="text-base font-semibold">2. Choose Payment Schedule</Label>
+                <RadioGroup value={paymentType} onValueChange={setPaymentType} className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-2 border border-border p-3 rounded-lg bg-card hover:bg-secondary/50 cursor-pointer [&:has([data-state=checked])]:border-primary">
+                        <RadioGroupItem value="full" id="pay-full" />
+                        <Label htmlFor="pay-full" className="cursor-pointer flex-grow font-medium">
+                            Pay Full <br/>
+                            <span className="text-sm text-muted-foreground">₹{finalTotal.toLocaleString()}</span>
+                        </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 border border-border p-3 rounded-lg bg-card hover:bg-secondary/50 cursor-pointer [&:has([data-state=checked])]:border-primary">
+                        <RadioGroupItem value="installment" id="pay-installment" />
+                        <Label htmlFor="pay-installment" className="cursor-pointer flex-grow font-medium">
+                            50% Advance <br/>
+                            <span className="text-sm text-muted-foreground">₹{(finalTotal * 0.5).toLocaleString()}</span>
+                        </Label>
+                    </div>
+                </RadioGroup>
+            </div>
+
+            {/* Customer Information Form - ONLY FOR QR CODE */}
+            {paymentMethod === 'qrcode' && (
+            <div className="mb-6 space-y-4 pb-4 border-b border-border animate-in fade-in slide-in-from-top-4">
+              <Label className="text-base font-semibold block mb-3">3. Customer Information</Label>
               
               <div className="space-y-2">
                 <Label htmlFor="customer-name" className="text-sm">Name *</Label>
@@ -645,94 +722,26 @@ export default function Cart() {
                   <p className="text-xs text-red-500">{formErrors.contact}</p>
                 )}
               </div>
-
-              <div className="space-y-2 bg-secondary/30 p-3 rounded-lg">
-                <Label className="text-sm font-semibold">Product Details</Label>
-                <p className="text-xs text-muted-foreground">
-                  {hasPendingPayment 
-                    ? "Clearing pending payment"
-                    : items.map(item => item.name).join(", ")}
-                </p>
-              </div>
-
-              <div className="space-y-2 bg-secondary/30 p-3 rounded-lg">
-                <Label className="text-sm font-semibold">Payment Amount</Label>
-                <p className="text-lg font-bold">₹{payableAmount.toLocaleString()}</p>
-              </div>
             </div>
-
-            {/* Payment Type Selection */}
-            <div className="mb-6 space-y-3">
-                <Label className="text-base font-semibold">2. Choose Payment Schedule</Label>
-                <RadioGroup value={paymentType} onValueChange={setPaymentType} className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center space-x-2 border border-border p-3 rounded-lg bg-card hover:bg-secondary/50 cursor-pointer [&:has([data-state=checked])]:border-primary">
-                        <RadioGroupItem value="full" id="pay-full" />
-                        <Label htmlFor="pay-full" className="cursor-pointer flex-grow font-medium">
-                            Pay Full <br/>
-                            <span className="text-sm text-muted-foreground">₹{finalTotal.toLocaleString()}</span>
-                        </Label>
-                    </div>
-                    <div className="flex items-center space-x-2 border border-border p-3 rounded-lg bg-card hover:bg-secondary/50 cursor-pointer [&:has([data-state=checked])]:border-primary">
-                        <RadioGroupItem value="installment" id="pay-installment" />
-                        <Label htmlFor="pay-installment" className="cursor-pointer flex-grow font-medium">
-                            50% Advance <br/>
-                            <span className="text-sm text-muted-foreground">₹{(finalTotal * 0.5).toLocaleString()}</span>
-                        </Label>
-                    </div>
-                </RadioGroup>
-            </div>
-
-            <Label className="text-base font-semibold mb-3 block">3. Select Payment Method</Label>
-            <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="gap-4">
-              <div className="flex flex-col border border-border p-4 rounded-lg bg-card hover:bg-secondary/50 transition-colors cursor-pointer">
-                <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="razorpay" id="razorpay" />
-                    <Label htmlFor="razorpay" className="flex-grow cursor-pointer flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-blue-100 p-2 rounded-full">
-                            <CreditCard className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <div>
-                            <span className="font-semibold block">Pay via Razorpay</span>
-                            <span className="text-xs text-muted-foreground">Credit/Debit Card, UPI, NetBanking</span>
-                        </div>
-                    </div>
-                    </Label>
-                </div>
-              </div>
-
-              <div className="flex flex-col border border-border p-4 rounded-lg bg-card hover:bg-secondary/50 transition-colors cursor-pointer">
-                <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="qrcode" id="qrcode" />
-                    <Label htmlFor="qrcode" className="flex-grow cursor-pointer flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-purple-100 p-2 rounded-full">
-                            <QrCode className="w-5 h-5 text-purple-600" />
-                        </div>
-                        <div>
-                            <span className="font-semibold block">Pay via QR Code</span>
-                            <span className="text-xs text-muted-foreground">Scan & Pay Manually</span>
-                        </div>
-                    </div>
-                    </Label>
-                </div>
-                {paymentMethod === 'qrcode' && (
-                    <div className="mt-4 flex flex-col items-center justify-center animate-in slide-in-from-top-2 w-full">
-                        <img 
-                            src="https://cdn.designfast.io/image/2026-01-23/39481c7a-457d-49f4-b132-8c9167ada421.jpeg" 
-                            alt="Payment QR Code" 
-                            className="w-full max-w-sm h-auto object-contain rounded-lg border-2 border-primary/20 shadow-md mb-4"
-                        />
-                        <p className="text-sm text-center font-medium">
-                            Scan & Pay <strong>₹{payableAmount.toLocaleString()}</strong>
-                        </p>
-                    </div>
-                )}
-              </div>
-            </RadioGroup>
+            )}
             
-            {/* Receipt Upload Section */}
-            <div className="mt-6 space-y-3 border-t border-border pt-6">
+            <div className="space-y-2 bg-secondary/30 p-3 rounded-lg mb-6">
+               <Label className="text-sm font-semibold">Product Details</Label>
+               <p className="text-xs text-muted-foreground">
+                 {hasPendingPayment 
+                   ? "Clearing pending payment"
+                   : items.map(item => item.name).join(", ")}
+               </p>
+            </div>
+
+            <div className="space-y-2 bg-secondary/30 p-3 rounded-lg mb-6">
+               <Label className="text-sm font-semibold">Payment Amount</Label>
+               <p className="text-lg font-bold">₹{payableAmount.toLocaleString()}</p>
+            </div>
+            
+            {/* Receipt Upload Section - ONLY FOR QR CODE */}
+            {paymentMethod === 'qrcode' && (
+            <div className="mt-6 space-y-3 border-t border-border pt-6 animate-in fade-in slide-in-from-top-4">
               <Label className="text-base font-semibold block">4. Upload Payment Receipt *</Label>
               <p className="text-xs text-muted-foreground">
                 Screenshot of payment confirmation is required for verification.
@@ -756,6 +765,7 @@ export default function Cart() {
                 <p className="text-xs text-red-500">{formErrors.receipt}</p>
               )}
             </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-3">
