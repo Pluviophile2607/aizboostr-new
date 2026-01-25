@@ -201,4 +201,80 @@ router.post('/qr-payment', upload.single('receiptImage'), async (req, res) => {
   }
 });
 
+// @route   POST api/payment/create-order
+// @desc    Create Razorpay Order
+// @access  Private (Registered users)
+router.post('/create-order', async (req, res) => {
+    try {
+        const { amount, currency = "INR" } = req.body;
+
+        if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+            return res.status(500).json({ message: "Razorpay keys not configured" });
+        }
+
+        const razorpay = new require('razorpay')({
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET
+        });
+
+        const options = {
+            amount: amount, // Amount in lowest denomination (paise)
+            currency: currency,
+            receipt: `receipt_${Date.now()}`,
+        };
+
+        const order = await razorpay.orders.create(options);
+
+        if (!order) {
+            return res.status(500).send("Some error occurred");
+        }
+
+        res.json(order);
+    } catch (error) {
+        console.error("Razorpay Order Error:", error);
+        res.status(500).send(error);
+    }
+});
+
+// @route   POST api/payment/verify-payment
+// @desc    Verify Razorpay Payment Signature
+// @access  Public
+router.post('/verify-payment', async (req, res) => {
+    try {
+        const {
+            razorpay_order_id,
+            razorpay_payment_id,
+            razorpay_signature
+        } = req.body;
+
+        if (!process.env.RAZORPAY_KEY_SECRET) {
+             return res.status(500).json({ message: "Razorpay secret not configured" });
+        }
+
+        const crypto = require('crypto');
+        const hmac = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET);
+        
+        hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
+        const generated_signature = hmac.digest("hex");
+
+        if (generated_signature === razorpay_signature) {
+            // Payment is successful
+            res.json({
+                success: true,
+                message: "Payment verified successfully",
+                paymentId: razorpay_payment_id,
+                orderId: razorpay_order_id
+            });
+        } else {
+            res.status(400).json({
+                success: false,
+                message: "Invalid signature"
+            });
+        }
+    } catch (error) {
+         console.error("Payment Verification Error:", error);
+         res.status(500).send("Internal Server Error");
+    }
+});
+
 module.exports = router;

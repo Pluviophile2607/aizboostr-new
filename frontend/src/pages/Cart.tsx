@@ -198,82 +198,109 @@ export default function Cart() {
 
         setShowPaymentModal(false);
         
-        const options = {
-            key: import.meta.env.VITE_RAZORPAY_KEY_ID, 
-            amount: payableAmountPaise, 
-            currency: "INR",
-            name: "AIZboostr",
-            description: hasPendingPayment ? "Clearance Payment" : "Growth Plan Subscription",
-            image: "https://aizboostr.com/logo.png",
-            handler: async function (response: any) {
-                console.log("Payment Success:", response);
-                
-                try {
-                    // Determine Payment Type
-                    let currentPaymentType = 'full';
-                    if (hasPendingPayment) {
-                        currentPaymentType = 'clearance';
-                    } else if (paymentType === 'installment') {
-                        currentPaymentType = 'advance';
+        try {
+            // Create Order
+            const orderResponse = await api.post('/payment/create-order', {
+                amount: payableAmountPaise, // Send amount in paise
+                currency: "INR"
+            });
+
+            const { id: order_id, currency, amount } = orderResponse.data;
+
+            const options = {
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID, 
+                amount: amount, 
+                currency: currency,
+                name: "AIZboostr",
+                description: hasPendingPayment ? "Clearance Payment" : "Growth Plan Subscription",
+                image: "https://aizboostr.com/logo.png",
+                order_id: order_id, // Pass order_id
+                handler: async function (response: any) {
+                    console.log("Payment Success:", response);
+                    
+                    try {
+                        // Verify Payment
+                        const verifyResponse = await api.post('/payment/verify-payment', {
+                             razorpay_order_id: response.razorpay_order_id,
+                             razorpay_payment_id: response.razorpay_payment_id,
+                             razorpay_signature: response.razorpay_signature
+                        });
+
+                        if (verifyResponse.data.success) {
+                            // Determine Payment Type
+                            let currentPaymentType = 'full';
+                            if (hasPendingPayment) {
+                                currentPaymentType = 'clearance';
+                            } else if (paymentType === 'installment') {
+                                currentPaymentType = 'advance';
+                            }
+
+                            // Save Payment
+                            await api.post('/payment/save', {
+                                name: customerName,
+                                mobileNumber: customerContact,
+                                email: customerEmail,
+                                amount: payableAmount,
+                                productDetails: hasPendingPayment ? (user.pendingPayment?.productDetails || []) : items,
+                                transactionId: response.razorpay_payment_id,
+                                paymentId: response.razorpay_payment_id,
+                                paymentType: currentPaymentType
+                            });
+
+                            toast({
+                                title: "Payment Successful!",
+                                description: `Payment ID: ${response.razorpay_payment_id}. Verified & Saved.`,
+                                variant: "default",
+                                className: "bg-green-600 text-white"
+                            });
+                            
+                            setTimeout(() => window.location.reload(), 2000); 
+                            clearCart();
+                        } else {
+                             toast({ variant: "destructive", title: "Verification Failed", description: "Payment verification failed." });
+                        }
+                    } catch (error) {
+                        console.error("Error saving payment details:", error);
+                         toast({
+                            title: "Payment Processed",
+                            description: `Payment ID: ${response.razorpay_payment_id}. details save failed.`,
+                            variant: "default",
+                            className: "bg-green-600 text-white"
+                        });
+                        clearCart();
                     }
-
-                    await api.post('/payment/save', {
-                        name: customerName,
-                        mobileNumber: customerContact,
-                        email: customerEmail,
-                        amount: payableAmount,
-                        productDetails: hasPendingPayment ? (user.pendingPayment?.productDetails || []) : items,
-                        transactionId: response.razorpay_payment_id,
-                        paymentId: response.razorpay_payment_id,
-                        paymentType: currentPaymentType
-                    });
-
-                    toast({
-                        title: "Payment Successful!",
-                        description: `Payment ID: ${response.razorpay_payment_id}. Saved successfully.`,
-                        variant: "default",
-                        className: "bg-green-600 text-white"
-                    });
-                    
-                    // Force page reload to refresh auth state (or call a refresh function if available)
-                    setTimeout(() => window.location.reload(), 2000); 
-                    
-                    clearCart();
-                } catch (error) {
-                    console.error("Error saving payment details:", error);
-                     toast({
-                        title: "Payment Successful!",
-                        description: `Payment ID: ${response.razorpay_payment_id}. processed but details save failed.`,
-                        variant: "default",
-                        className: "bg-green-600 text-white"
-                    });
-                    clearCart();
+                },
+                prefill: {
+                    name: customerName || "",
+                    email: customerEmail || "",
+                    contact: customerContact || ""
+                },
+                notes: {
+                    address: "AIZboostr Corporate Office"
+                },
+                theme: {
+                    color: hasPendingPayment ? "#EF4444" : "#FACC15" 
                 }
-            },
-            prefill: {
-                name: customerName || "",
-                email: customerEmail || "",
-                contact: customerContact || ""
-            },
-            notes: {
-                address: "AIZboostr Corporate Office"
-            },
-            theme: {
-                color: hasPendingPayment ? "#EF4444" : "#FACC15" // Red for pending, Yellow for normal
-            }
-        };
+            };
 
-        const rzp1 = new (window as any).Razorpay(options);
-        rzp1.on('payment.failed', function (response: any){
-                toast({
-                    title: "Payment Failed",
-                    description: response.error.description,
-                    variant: "destructive"
-                });
-        });
-        rzp1.open();
+            const rzp1 = new (window as any).Razorpay(options);
+            rzp1.on('payment.failed', function (response: any){
+                    toast({
+                        title: "Payment Failed",
+                        description: response.error.description,
+                        variant: "destructive"
+                    });
+            });
+            rzp1.open();
+        } catch (error) {
+             console.error("Order Creation Logic Error:", error);
+             toast({
+                variant: "destructive",
+                title: "Order Failed",
+                description: "Could not initiate payment order.",
+            });
+        }
     } else if (paymentMethod === 'qrcode') {
-        // ... (Keep existing QR logic but update paymentType/amount if needed - leaving as is for now as User focused on Razorpay)
         if (!selectedReceipt) {
             toast({
                 variant: "destructive",
@@ -657,7 +684,22 @@ export default function Cart() {
 
             <Label className="text-base font-semibold mb-3 block">3. Select Payment Method</Label>
             <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="gap-4">
-              {/* Razorpay option temporarily removed */}
+              <div className="flex flex-col border border-border p-4 rounded-lg bg-card hover:bg-secondary/50 transition-colors cursor-pointer">
+                <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="razorpay" id="razorpay" />
+                    <Label htmlFor="razorpay" className="flex-grow cursor-pointer flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-blue-100 p-2 rounded-full">
+                            <CreditCard className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <div>
+                            <span className="font-semibold block">Pay via Razorpay</span>
+                            <span className="text-xs text-muted-foreground">Credit/Debit Card, UPI, NetBanking</span>
+                        </div>
+                    </div>
+                    </Label>
+                </div>
+              </div>
 
               <div className="flex flex-col border border-border p-4 rounded-lg bg-card hover:bg-secondary/50 transition-colors cursor-pointer">
                 <div className="flex items-center space-x-2">
