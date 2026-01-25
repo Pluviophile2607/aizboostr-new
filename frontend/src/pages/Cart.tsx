@@ -632,7 +632,7 @@ export default function Cart() {
                 {paymentMethod === 'qrcode' && (
                     <div className="mt-4 flex flex-col items-center justify-center animate-in slide-in-from-top-2 w-full">
                         <img 
-                            src="https://cdn.designfast.io/image/2026-01-23/39481c7a-457d-49f4-b132-8c9167ada421.jpeg" 
+                            src="https://cdn.designfast.io/image/2026-01-25/317dca81-ed89-4e5d-be19-32515721b183.jpeg" 
                             alt="Payment QR Code" 
                             className="w-full max-w-sm h-auto object-contain rounded-lg border-2 border-primary/20 shadow-md mb-4"
                         />
