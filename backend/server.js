@@ -16,7 +16,6 @@ const allowedOrigins = [
   'https://aizboostr-brand-brilliance.vercel.app', 
   'http://localhost:5173', 
   'http://localhost:8080',
-  'https://us.cloudlogin.co'
 ];
 
 app.use(cors({
@@ -39,7 +38,7 @@ app.use(function(req, res, next) {
 });
 
 // Enable pre-flight across-the-board
-app.options('*', cors());
+app.options('(.*)', cors());
 app.use(express.json());
 
 // Database Connection
