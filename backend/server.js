@@ -38,7 +38,7 @@ app.use(function(req, res, next) {
 });
 
 // Enable pre-flight across-the-board
-app.options('(.*)', cors());
+app.options(/.*/, cors());
 app.use(express.json());
 
 // Database Connection
