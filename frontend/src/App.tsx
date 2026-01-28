@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CompleteProfileModal } from "./components/CompleteProfileModal";
-import { FloatingCallButton } from "./components/FloatingCallButton";
+import { FloatingWhatsAppButton } from "./components/FloatingWhatsAppButton";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CartProvider } from "@/context/CartContext";
@@ -49,7 +49,7 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <FloatingCallButton />
+              <FloatingWhatsAppButton />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
