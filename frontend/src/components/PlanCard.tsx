@@ -102,6 +102,18 @@ export const PlanCard = ({ plan, isCompact = false, orientation = "vertical", no
       return;
     }
 
+    // Check for pending payment - block new purchases until cleared
+    const hasPendingPayment = user?.pendingPayment?.isPending;
+    if (hasPendingPayment && !isSelected) {
+      toast({
+        variant: "destructive",
+        title: "Pending Payment",
+        description: `You have a pending balance of ₹${user?.pendingPayment?.amount?.toLocaleString()}. Please clear your dues before purchasing new plans.`,
+      });
+      navigate("/cart");
+      return;
+    }
+
     if (isSelected) {
       removeFromCart(cartItemId);
       setHasAddOn(false); // Reset add-on state when removing plan

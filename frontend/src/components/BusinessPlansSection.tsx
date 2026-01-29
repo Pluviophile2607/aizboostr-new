@@ -11,6 +11,19 @@ type TabType = typeof validTabs[number];
 
 const plansData = [
   {
+    id: "demo",
+    name: "Demo Plan",
+    price: 4,
+    description: "For testing payment gateway",
+    color: "cyan",
+    badge: "TEST",
+    features: [
+      { name: "Test Payment", desc: "Verify gateway works", value: "₹4", color: "cyan" },
+    ],
+    discount: "For testing only",
+    gradient: "from-cyan-400 via-teal-500 to-emerald-500",
+  },
+  {
     id: "regular",
     name: "Regular Plan",
     price: 14000,

@@ -103,28 +103,6 @@ export function Footer() {
           ))}
         </div>
 
-        {/* Newsletter */}
-        <div className="mt-16 pt-8 border-t border-border">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div>
-              <h4 className="font-semibold mb-2 text-foreground">Stay Updated</h4>
-              <p className="text-sm text-muted-foreground">
-                Get the latest AI insights and updates delivered to your inbox.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="px-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-foreground text-sm w-full sm:w-64 text-foreground"
-              />
-              <button className="px-6 py-2 bg-foreground text-background rounded-lg font-medium hover:bg-foreground/90 transition-colors">
-                Subscribe
-              </button>
-            </div>
-          </div>
-        </div>
-
         {/* Copyright */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
