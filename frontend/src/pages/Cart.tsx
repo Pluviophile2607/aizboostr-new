@@ -26,6 +26,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function Cart() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { items, removeFromCart, cartTotal, clearCart } = useCart();
   const [couponCode, setCouponCode] = useState("");
   const [discountApplied, setDiscountApplied] = useState(false);
@@ -240,11 +241,11 @@ export default function Cart() {
                                 currentPaymentType = 'advance';
                             }
 
-                            // Save Payment
-                            await api.post('/payment/save', {
-                                name: customerName,
-                                mobileNumber: customerContact,
-                                email: customerEmail,
+                            // Save Payment and get invoice
+                            const saveResponse = await api.post('/payment/save', {
+                                name: customerName || user?.name,
+                                mobileNumber: customerContact || user?.mobileNumber,
+                                email: customerEmail || user?.email,
                                 amount: payableAmount,
                                 productDetails: hasPendingPayment ? (user.pendingPayment?.productDetails || []) : items,
                                 transactionId: response.razorpay_payment_id,
@@ -259,8 +260,14 @@ export default function Cart() {
                                 className: "bg-green-600 text-white"
                             });
                             
-                            setTimeout(() => window.location.reload(), 2000); 
                             clearCart();
+                            
+                            // Navigate to invoice page
+                            if (saveResponse.data.invoiceId) {
+                                navigate(`/invoice/${saveResponse.data.invoiceId}`);
+                            } else {
+                                setTimeout(() => window.location.reload(), 2000);
+                            }
                         } else {
                              toast({ variant: "destructive", title: "Verification Failed", description: "Payment verification failed." });
                         }
@@ -370,6 +377,11 @@ export default function Cart() {
             setShowPaymentModal(false);
             clearCart();
             setSelectedReceipt(null);
+            
+            // Navigate to invoice page
+            if (response.data.invoiceId) {
+                navigate(`/invoice/${response.data.invoiceId}`);
+            }
         } catch (error: any) {
             console.error("Order processing error:", error);
             console.error("Error details:", {

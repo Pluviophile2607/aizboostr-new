@@ -18,6 +18,7 @@ import BusinessPlans from "./pages/BusinessPlans";
 import Cart from "./pages/Cart";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import InvoicePage from "./pages/InvoicePage";
 import NotFound from "./pages/NotFound";
 import IntroVideo from "./components/IntroVideo";
 
@@ -59,6 +60,7 @@ const App = () => {
                 <Route path="/video-ads" element={<VideoAds />} />
                 <Route path="/business-plans" element={<BusinessPlans />} />
                 <Route path="/cart" element={<Cart />} />
+                <Route path="/invoice/:invoiceId" element={<InvoicePage />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

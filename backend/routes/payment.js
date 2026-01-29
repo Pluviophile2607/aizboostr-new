@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const Payment = require('../models/Payment');
 const QRPayment = require('../models/QRPayment');
+const Invoice = require('../models/Invoice');
 const User = require('../models/User');
 
 // Configure multer for memory storage
@@ -39,6 +40,41 @@ router.post('/save', async (req, res) => {
 
     const savedPayment = await newPayment.save();
 
+    // Determine payment status label
+    let paymentStatusLabel = 'Full Payment';
+    if (paymentType === 'advance') {
+        paymentStatusLabel = '50% Advance';
+    } else if (paymentType === 'clearance') {
+        paymentStatusLabel = 'Clearance Payment';
+    }
+
+    // Calculate total amount for invoice
+    let totalAmount = amount;
+    if (paymentType === 'advance') {
+        totalAmount = amount * 2; // 50% advance means total is double
+    } else if (paymentType === 'clearance') {
+        totalAmount = amount * 2; // Clearance is also 50%
+    }
+
+    // Generate Invoice
+    const newInvoice = new Invoice({
+        customerName: name,
+        customerEmail: email,
+        customerPhone: mobileNumber,
+        productDetails: productDetails.map(p => ({
+            name: p.name || p.productName || 'Product',
+            price: p.price || 0,
+            billingCycle: p.billingCycle || 'one-time'
+        })),
+        totalAmount: totalAmount,
+        amountPaid: amount,
+        paymentStatus: paymentStatusLabel,
+        paymentMode: 'razorpay',
+        paymentId: paymentId || transactionId
+    });
+
+    const savedInvoice = await newInvoice.save();
+
     // Update User Pending Payment Status
     if (paymentType === 'advance') {
         // Find user and update pending payment
@@ -73,7 +109,7 @@ router.post('/save', async (req, res) => {
         });
     }
 
-    res.json(savedPayment);
+    res.json({ ...savedPayment.toObject(), invoiceId: savedInvoice._id, invoiceNumber: savedInvoice.invoiceNumber });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
@@ -187,12 +223,41 @@ router.post('/qr-payment', upload.single('receiptImage'), async (req, res) => {
         });
     }
 
+    // Determine payment status label for invoice
+    let invoicePaymentStatus = 'Full Payment';
+    if (paymentType === 'advance') {
+        invoicePaymentStatus = '50% Advance';
+    } else if (paymentType === 'clearance') {
+        invoicePaymentStatus = 'Clearance Payment';
+    }
+
+    // Generate Invoice for QR Payment
+    const newInvoice = new Invoice({
+        customerName: name,
+        customerEmail: email,
+        customerPhone: mobileNumber,
+        productDetails: JSON.parse(productDetails).map(p => ({
+            name: p.name || p.productName || 'Product',
+            price: p.price || 0,
+            billingCycle: p.billingCycle || 'one-time'
+        })),
+        totalAmount: totalAmount,
+        amountPaid: amountPaid,
+        paymentStatus: invoicePaymentStatus,
+        paymentMode: 'qrcode',
+        paymentId: savedQRPayment._id.toString()
+    });
+
+    const savedInvoice = await newInvoice.save();
+
     res.json({
       success: true,
       payment: {
         ...savedQRPayment.toObject(),
         receiptImage: { contentType: savedQRPayment.receiptImage.contentType } // Don't send Base64 back
       },
+      invoiceId: savedInvoice._id,
+      invoiceNumber: savedInvoice.invoiceNumber,
       message: 'QR payment submitted successfully. Payment is pending verification.'
     });
   } catch (err) {
@@ -275,6 +340,26 @@ router.post('/verify-payment', async (req, res) => {
     } catch (error) {
          console.error("Payment Verification Error:", error);
          res.status(500).send("Internal Server Error");
+    }
+});
+
+// @route   GET api/payment/invoice/:invoiceId
+// @desc    Get invoice by ID
+// @access  Public
+router.get('/invoice/:invoiceId', async (req, res) => {
+    try {
+        const { invoiceId } = req.params;
+        
+        const invoice = await Invoice.findById(invoiceId);
+        
+        if (!invoice) {
+            return res.status(404).json({ message: 'Invoice not found' });
+        }
+        
+        res.json(invoice);
+    } catch (error) {
+        console.error('Invoice Fetch Error:', error);
+        res.status(500).json({ message: 'Server Error', error: error.message });
     }
 });
 
