@@ -72,9 +72,14 @@ export const PlanCard = ({ plan, isCompact = false, orientation = "vertical", no
   const pricePerUnit = plan.dynamicConfig?.pricePerUnit || 1;
   const baseUnits = plan.dynamicConfig?.baseUnits || 5000;
 
-  const additionalCost = Math.max(0, (viewCount - baseUnits) * pricePerUnit);
+  const hasDynamicFeature = plan.features.some((f) => f.isDynamic);
+  const additionalCost = hasDynamicFeature ? Math.max(0, (viewCount - baseUnits) * pricePerUnit) : 0;
   const dynamicPrice = plan.price + additionalCost;
-  const cartItemId = `${plan.id}-${viewCount}${hasAddOn ? '-addon' : ''}`;
+  
+  // Only include viewCount in cartItemId for plans with dynamic features
+  const cartItemId = hasDynamicFeature 
+    ? `${plan.id}-${viewCount}${hasAddOn ? '-addon' : ''}`
+    : `${plan.id}${hasAddOn ? '-addon' : ''}`;
   
   // For 30 Days Content Plans, check if ANY item with this plan.id exists in cart
   // For other plans, use exact cartItemId match
@@ -135,10 +140,15 @@ export const PlanCard = ({ plan, isCompact = false, orientation = "vertical", no
          updatedFeatures.push("Social Media Management (Add-On)");
       }
 
+      // Only add Views count to name if plan has dynamic features
+      const cartName = hasDynamicFeature 
+        ? `${plan.name} (${viewCount.toLocaleString()} Views)${hasAddOn ? ' + Social Media Mgmt' : ''}`
+        : `${plan.name}${hasAddOn ? ' + Social Media Mgmt' : ''}`;
+
       addToCart({
         id: cartItemId,
         type: "fixed",
-        name: `${plan.name} (${viewCount.toLocaleString()} Views)${hasAddOn ? ' + Social Media Mgmt' : ''}`,
+        name: cartName,
         price: dynamicPrice + (hasAddOn ? 2500 : 0),
         billingCycle: "month",
         features: updatedFeatures,
@@ -154,23 +164,33 @@ export const PlanCard = ({ plan, isCompact = false, orientation = "vertical", no
 
   const handleAddOnToggle = () => {
      const newAddOnState = !hasAddOn;
-     const oldId = `${plan.id}-${viewCount}${hasAddOn ? '-addon' : ''}`;
-     const newId = `${plan.id}-${viewCount}${newAddOnState ? '-addon' : ''}`;
+     const oldId = hasDynamicFeature 
+       ? `${plan.id}-${viewCount}${hasAddOn ? '-addon' : ''}`
+       : `${plan.id}${hasAddOn ? '-addon' : ''}`;
+     const newId = hasDynamicFeature 
+       ? `${plan.id}-${viewCount}${newAddOnState ? '-addon' : ''}`
+       : `${plan.id}${newAddOnState ? '-addon' : ''}`;
      removeFromCart(oldId);
      setHasAddOn(newAddOnState);
-     const updatedFeatures = plan.features.map((f) => {
-        if (f.isDynamic) {
-          return `${viewCount.toLocaleString()} ${f.name}`;
-        }
-        return f.name;
-      });
-      if (newAddOnState) {
-         updatedFeatures.push("Social Media Management (Add-On)");
-      }
+      const updatedFeatures = plan.features.map((f) => {
+         if (f.isDynamic) {
+           return `${viewCount.toLocaleString()} ${f.name}`;
+         }
+         return f.name;
+       });
+       if (newAddOnState) {
+          updatedFeatures.push("Social Media Management (Add-On)");
+       }
+
+      // Only add Views count to name if plan has dynamic features
+      const cartName = hasDynamicFeature 
+        ? `${plan.name} (${viewCount.toLocaleString()} Views)${newAddOnState ? ' + Social Media Mgmt' : ''}`
+        : `${plan.name}${newAddOnState ? ' + Social Media Mgmt' : ''}`;
+
      addToCart({
         id: newId,
         type: "fixed",
-        name: `${plan.name} (${viewCount.toLocaleString()} Views)${newAddOnState ? ' + Social Media Mgmt' : ''}`,
+        name: cartName,
         price: dynamicPrice + (newAddOnState ? 2500 : 0),
         billingCycle: "month",
         features: updatedFeatures,

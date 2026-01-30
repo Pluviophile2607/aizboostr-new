@@ -56,12 +56,23 @@ export default function Cart() {
   const hasPendingPayment = user?.pendingPayment?.isPending;
   const pendingAmount = user?.pendingPayment?.amount || 0;
 
+  const [discountPercent, setDiscountPercent] = useState(0);
+
   const handleApplyCoupon = () => {
-    if (couponCode.toUpperCase() === "ZED10") {
+    const code = couponCode.toUpperCase();
+    if (code === "ZED10") {
       setDiscountApplied(true);
+      setDiscountPercent(10);
       toast({
         title: "Coupon Applied!",
         description: "10% discount applied.",
+      });
+    } else if (code === "ZED15") {
+      setDiscountApplied(true);
+      setDiscountPercent(15);
+      toast({
+        title: "Coupon Applied!",
+        description: "15% discount applied.",
       });
     } else {
       toast({
@@ -74,6 +85,7 @@ export default function Cart() {
   
   const handleRemoveCoupon = () => {
     setDiscountApplied(false);
+    setDiscountPercent(0);
     setCouponCode("");
     toast({
       title: "Coupon Removed",
@@ -106,7 +118,7 @@ export default function Cart() {
   // Calculate totals in integer subunits (paise)
   // If pending, amount is fixed to pending amount
   const cartTotalPaise = Math.round(cartTotal * 100);
-  const discountAmountPaise = discountApplied ? Math.round(cartTotalPaise * 0.10) : 0;
+  const discountAmountPaise = discountApplied ? Math.round(cartTotalPaise * (discountPercent / 100)) : 0;
   const finalTotalPaise = cartTotalPaise - discountAmountPaise;
   
   // Calculate payable amount logic
@@ -547,7 +559,7 @@ export default function Cart() {
                     
                     {discountApplied && (
                          <div className="flex justify-between text-green-500 font-medium animate-in fade-in slide-in-from-right-4">
-                            <span>Discount (10%)</span>
+                            <span>Discount ({discountPercent}%)</span>
                             <span>-₹{discountAmount.toLocaleString()}</span>
                          </div>
                     )}

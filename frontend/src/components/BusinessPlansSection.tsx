@@ -6,23 +6,10 @@ import GradientText from "./GradientText";
 import { PlanCard } from "./PlanCard";
 import { useAuth } from "@/hooks/useAuth";
 
-const validTabs = ["business", "content", "custom"] as const;
+const validTabs = ["custom", "business", "content"] as const;
 type TabType = typeof validTabs[number];
 
 const plansData = [
-  {
-    id: "demo",
-    name: "Demo Plan",
-    price: 4,
-    description: "For testing payment gateway",
-    color: "cyan",
-    badge: "TEST",
-    features: [
-      { name: "Test Payment", desc: "Verify gateway works", value: "₹4", color: "cyan" },
-    ],
-    discount: "For testing only",
-    gradient: "from-cyan-400 via-teal-500 to-emerald-500",
-  },
   {
     id: "regular",
     name: "Regular Plan",
@@ -33,7 +20,6 @@ const plansData = [
       { name: "3 Social Media Setup", desc: "Insta, FB, YouTube", value: "₹3,000", color: "green" },
       { name: "GMB Setup", desc: "Normal setup & manage", value: "₹2,500", color: "green" },
       { name: "1 Ad Video (30 sec)", desc: "Full customization", value: "₹3,500", color: "green" },
-      { name: "Views", desc: "₹1/view (min 5k)", value: "₹5,000", color: "green", info: "Status Marketing Views", isDynamic: true },
     ],
     discount: "No discount applicable",
     gradient: "from-primary via-purple-500 to-pink-500",
@@ -49,10 +35,24 @@ const plansData = [
       { name: "Social Media Mgmt", desc: "All platforms - Full Service", value: "₹3,000", color: "primary" },
       { name: "GMB Setup", desc: "Updates, Local SEO, Rating", value: "₹7,000", color: "primary" },
       { name: "Pack of 4 Ad Videos", desc: "Full custom. +₹2k 2nd lang", value: "₹10,000", color: "primary" },
-      { name: "Views", desc: "₹1/view (min 5k)", value: "₹5,000", color: "primary", info: "Status Marketing Views", isDynamic: true },
     ],
     discount: "Best Value for Growth",
     gradient: "from-primary via-purple-500 to-pink-500",
+  },
+  {
+    id: "starter-combo",
+    name: "Starter Combo Plan",
+    price: 28000,
+    description: "Complete business starter package",
+    color: "blue",
+    badge: "COMBO",
+    features: [
+      { name: "Website", desc: "1yr hosting, domain, email, 3mo mgmt", value: "₹15,000", color: "blue" },
+      { name: "G.M.B Setup & Mgmt", desc: "Google My Business", value: "₹3,000", color: "blue" },
+      { name: "Double Discount", desc: "10 videos (15s) + 5 flyers", value: "₹10,000", color: "blue" },
+    ],
+    discount: "Save with Combo",
+    gradient: "from-blue-500 via-cyan-500 to-teal-500",
   },
   {
     id: "pro-premium",
@@ -67,7 +67,6 @@ const plansData = [
       { name: "WhatsApp Chat Bot", desc: "24/7 automated support", value: "₹7,000", color: "purple" },
       { name: "Pack of 4 Ad Videos", desc: "Full custom. +₹2k 2nd lang", value: "₹10,000", color: "purple" },
       { name: "Meta & Google Boost", desc: "50% charged for maint.", value: "₹5,000", color: "purple" },
-      { name: "Views", desc: "₹1/view (min 5k)", value: "₹5,000", color: "purple", info: "Status Marketing Views", isDynamic: true },
     ],
     discount: null,
     gradient: "from-primary via-purple-500 to-pink-500",
@@ -143,7 +142,7 @@ const digitalFootprintPlansData = [
   {
     id: "insta-setup-mgmt",
     name: "Instagram Setup & Management (Monthly)",
-    price: 1000,
+    price: 700,
     description: "Profile optimization, bio setup, highlights, content strategy, and monthly management",
     color: "pink",
     features: [],
@@ -153,7 +152,7 @@ const digitalFootprintPlansData = [
   {
     id: "fb-setup-mgmt",
     name: "Facebook Setup & Management (Monthly)",
-    price: 1000,
+    price: 700,
     description: "Page creation, cover design, about section, business info setup, and monthly management",
     color: "blue",
     features: [],
@@ -163,7 +162,7 @@ const digitalFootprintPlansData = [
   {
     id: "linkedin-setup-mgmt",
     name: "LinkedIn Setup & Management (Monthly)",
-    price: 1000,
+    price: 700,
     description: "Company page creation, banner design, professional profile optimization, and monthly management",
     color: "indigo",
     features: [],
@@ -173,7 +172,7 @@ const digitalFootprintPlansData = [
   {
     id: "twitter-setup-mgmt",
     name: "Twitter/X Setup & Management (Monthly)",
-    price: 1000,
+    price: 700,
     description: "Profile setup, header design, bio optimization, pinned tweet strategy, and monthly management",
     color: "sky",
     features: [],
@@ -183,7 +182,7 @@ const digitalFootprintPlansData = [
   {
     id: "youtube-setup-mgmt",
     name: "YouTube Setup & Management (Monthly)",
-    price: 1000,
+    price: 700,
     description: "Channel creation, banner design, about section, video optimization, and monthly management",
     color: "red",
     features: [],
@@ -360,40 +359,6 @@ const digitalReachPlansData = [
     gradient: "from-orange-600 via-red-500 to-pink-500",
   },
   {
-    id: "whatsapp-broadcast",
-    name: "WhatsApp Broadcast",
-    price: 5000,
-    description: "Monthly WhatsApp broadcast campaigns to your customer list",
-    color: "green",
-    features: [
-      { name: "Monthly campaigns", desc: "Regular customer outreach", value: "Included", color: "green" },
-      { name: "Customer list", desc: "Targeted broadcasting", value: "Included", color: "green" },
-      { name: "Broadcast setup", desc: "Message formatting & sending", value: "Included", color: "green" },
-    ],
-    discount: null,
-    gradient: "from-green-500 via-emerald-500 to-teal-500",
-  },
-  {
-    id: "whatsapp-status-marketing",
-    name: "WhatsApp Status Marketing Software (U.S.P)",
-    price: 1000,
-    description: "₹1 per view (minimum 1000 views) - Automated WhatsApp status marketing. No discount applicable.",
-    color: "green",
-    features: [
-      { name: "Views", desc: "₹1/view (min 1k)", value: "₹1,000", color: "green", info: "Automated Status Views", isDynamic: true },
-    ],
-    discount: null,
-    gradient: "from-green-600 via-emerald-600 to-teal-600",
-    dynamicConfig: {
-      min: 1000,
-      max: 10000,
-      step: 100,
-      pricePerUnit: 1,
-      baseUnits: 1000,
-      unitName: "views"
-    }
-  },
-  {
     id: "meta-google-boosting",
     name: "Meta & Google Boosting",
     price: 5000,
@@ -521,6 +486,16 @@ export const BusinessPlansSection = ({ previewMode = false }: BusinessPlansSecti
           <div className="flex justify-center mb-12 animate-fade-up" style={{ animationDelay: "100ms" }}>
             <div className="bg-secondary p-1.5 rounded-2xl sm:rounded-full flex flex-col sm:flex-row w-full sm:w-auto gap-2 sm:gap-0">
               <button
+                onClick={() => setActiveTab("custom")}
+                className={`flex-1 sm:flex-none px-6 sm:px-8 py-3 rounded-xl sm:rounded-full text-sm font-medium transition-all duration-300 ${
+                  activeTab === "custom"
+                    ? "bg-foreground text-background shadow-md transform sm:scale-105"
+                    : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                }`}
+              >
+                Custom Packages
+              </button>
+              <button
                 onClick={() => setActiveTab("business")}
                 className={`flex-1 sm:flex-none px-6 sm:px-8 py-3 rounded-xl sm:rounded-full text-sm font-medium transition-all duration-300 ${
                   activeTab === "business"
@@ -540,16 +515,6 @@ export const BusinessPlansSection = ({ previewMode = false }: BusinessPlansSecti
               >
                 Content Only Plans
               </button>
-              <button
-                onClick={() => setActiveTab("custom")}
-                className={`flex-1 sm:flex-none px-6 sm:px-8 py-3 rounded-xl sm:rounded-full text-sm font-medium transition-all duration-300 ${
-                  activeTab === "custom"
-                    ? "bg-foreground text-background shadow-md transform sm:scale-105"
-                    : "text-muted-foreground hover:text-foreground hover:bg-background/50"
-                }`}
-              >
-                Custom Packages
-              </button>
             </div>
           </div>
         )}
@@ -567,9 +532,20 @@ export const BusinessPlansSection = ({ previewMode = false }: BusinessPlansSecti
                   Business Plans
                 </GradientText>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-8 items-stretch place-content-center">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-6 items-stretch place-content-center">
                 {plansData.map((plan) => (
-                  <PlanCard key={plan.id} plan={plan} />
+                  <div key={plan.id} className={plan.badge === "COMBO" ? "relative mt-2" : ""}>
+                    {plan.badge === "COMBO" && (
+                      <>
+                        {/* Premium glow effect */}
+                        <div className="absolute -inset-[2px] bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 rounded-2xl blur-sm opacity-75 animate-pulse" />
+                        <div className="absolute -inset-[1px] bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 rounded-2xl" />
+                      </>
+                    )}
+                    <div className={plan.badge === "COMBO" ? "relative bg-background rounded-2xl h-full" : ""}>
+                      <PlanCard plan={plan} />
+                    </div>
+                  </div>
                 ))}
               </div>
               
