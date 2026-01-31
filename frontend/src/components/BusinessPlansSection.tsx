@@ -124,16 +124,7 @@ const contentPlansData = [
 ];
 
 const digitalFootprintPlansData = [
-  {
-    id: "testing-plan",
-    name: "Testing Plan",
-    price: 5,
-    description: "For testing purposes only",
-    color: "gray",
-    features: [],
-    discount: null,
-    gradient: "from-gray-500 via-gray-400 to-gray-300",
-  },
+
   {
     id: "insta-setup-mgmt",
     name: "Instagram Setup & Management (Monthly)",
