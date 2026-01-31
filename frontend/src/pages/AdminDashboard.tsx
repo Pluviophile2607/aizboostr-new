@@ -22,7 +22,8 @@ interface Stats {
     verified: number;
     rejected: number;
   };
-  recentPayments: any[];
+  qrPaymentsList: any[];
+  razorpayPaymentsList: any[];
 }
 
 export default function AdminDashboard() {
@@ -33,6 +34,7 @@ export default function AdminDashboard() {
   const { theme, setTheme } = useTheme();
   const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
   const [isReceiptLoading, setIsReceiptLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'qr' | 'razorpay'>('qr');
 
   useEffect(() => {
     // Check if admin is logged in
@@ -83,6 +85,44 @@ export default function AdminDashboard() {
       });
     } finally {
       setIsReceiptLoading(false);
+    }
+  };
+
+  const handleStatusUpdate = async (paymentId: string, status: 'verified' | 'rejected') => {
+    try {
+      const response = await api.put(`/admin/payment/${paymentId}/status`, { status });
+      if (response.data.success) {
+        toast({
+          title: "Status Updated",
+          description: response.data.message,
+        });
+
+        // Update local state
+        if (stats) {
+          const updatedQRPayments = stats.qrPaymentsList.map(p => 
+            p.id === paymentId ? { ...p, status: status } : p
+          );
+          
+          const statusDiff = status === 'verified' ? { pending: -1, verified: 1 } : { pending: -1, rejected: 1 };
+          
+          setStats({
+            ...stats,
+            qrPaymentsList: updatedQRPayments,
+            statusBreakdown: {
+              ...stats.statusBreakdown,
+              pending: stats.statusBreakdown.pending + statusDiff.pending,
+              verified: stats.statusBreakdown.verified + (statusDiff.verified || 0),
+              rejected: stats.statusBreakdown.rejected + (statusDiff.rejected || 0)
+            }
+          });
+        }
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update status.",
+      });
     }
   };
 
@@ -247,55 +287,136 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Recent Payments */}
-        <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-          <h2 className="text-lg font-semibold mb-4">Recent Payments</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Customer</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Email</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Amount Paid</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Date</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {stats?.recentPayments.map((payment) => (
-                  <tr key={payment.id} className="border-b border-border hover:bg-secondary/50">
-                    <td className="py-3 px-4 text-sm">{payment.name}</td>
-                    <td className="py-3 px-4 text-sm text-muted-foreground">{payment.email}</td>
-                    <td className="py-3 px-4 text-sm font-semibold">₹{payment.amount.toLocaleString()}</td>
-                    <td className="py-3 px-4 text-sm">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        payment.status === 'verified' ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400' :
-                        payment.status === 'pending' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400' :
-                        'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
-                      }`}>
-                        {payment.paymentStatus}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-sm text-muted-foreground">
-                      {new Date(payment.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="py-3 px-4 text-sm">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => viewReceipt(payment.id)}
-                        disabled={isReceiptLoading}
-                      >
-                         View Receipt
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        {/* Tabs */}
+        <div className="flex space-x-2 mb-6">
+          <Button
+            variant={activeTab === 'qr' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('qr')}
+            className="w-full sm:w-auto"
+          >
+            QR Code Payments
+          </Button>
+          <Button
+            variant={activeTab === 'razorpay' ? 'default' : 'outline'}
+            onClick={() => setActiveTab('razorpay')}
+            className="w-full sm:w-auto"
+          >
+            Razorpay Payments
+          </Button>
         </div>
+
+        {/* QR Code Payments */}
+        {activeTab === 'qr' && (
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm mb-8">
+            <h2 className="text-lg font-semibold mb-4">QR Code Payments</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Customer</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Email</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Product</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Amount Paid</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Date</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats?.qrPaymentsList.map((payment) => (
+                    <tr key={payment.id} className="border-b border-border hover:bg-secondary/50">
+                      <td className="py-3 px-4 text-sm">{payment.name}</td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">{payment.email}</td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">{payment.productName}</td>
+                      <td className="py-3 px-4 text-sm font-semibold">₹{payment.amount.toLocaleString()}</td>
+                      <td className="py-3 px-4 text-sm">
+                        <span className={`px-2 py-1 rounded-full text-xs whitespace-nowrap ${
+                          payment.status === 'verified' ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400' :
+                          payment.status === 'pending' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400' :
+                          'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                        }`}>
+                          {payment.paymentStatus}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">
+                        {new Date(payment.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="py-3 px-4 text-sm flex items-center gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => viewReceipt(payment.id)}
+                          disabled={isReceiptLoading}
+                          className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                        >
+                           View Receipt
+                        </Button>
+                        
+                        {payment.status === 'pending' && (
+                          <>
+                            <Button 
+                              size="sm"
+                              className="bg-green-500 hover:bg-green-600 text-white"
+                              onClick={() => handleStatusUpdate(payment.id, 'verified')}
+                            >
+                              Accept
+                            </Button>
+                            <Button 
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleStatusUpdate(payment.id, 'rejected')}
+                            >
+                              Reject
+                            </Button>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Razorpay Payments */}
+        {activeTab === 'razorpay' && (
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+            <h2 className="text-lg font-semibold mb-4">Razorpay Payments</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Customer</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Email</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Product</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Amount Paid</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats?.razorpayPaymentsList.map((payment) => (
+                    <tr key={payment.id} className="border-b border-border hover:bg-secondary/50">
+                      <td className="py-3 px-4 text-sm">{payment.name}</td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">{payment.email}</td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">{payment.productName}</td>
+                      <td className="py-3 px-4 text-sm font-semibold">₹{payment.amount.toLocaleString()}</td>
+                      <td className="py-3 px-4 text-sm">
+                        <span className="px-2 py-1 rounded-full text-xs whitespace-nowrap bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                          {payment.paymentStatus}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">
+                        {new Date(payment.createdAt).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Receipt Viewer Modal */}

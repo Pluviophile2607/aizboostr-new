@@ -80,7 +80,6 @@ router.get('/stats', async (req, res) => {
     // Recent payments (last 5)
     const recentPayments = qrPayments
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .slice(0, 5)
       .map(payment => ({
         id: payment._id,
         name: payment.name,
@@ -89,6 +88,7 @@ router.get('/stats', async (req, res) => {
         totalAmount: payment.totalAmount || payment.amount,
         paymentStatus: payment.paymentStatus,
         status: payment.status,
+        productName: payment.productDetails ? payment.productDetails.map(p => p.name || p.productName || 'Product').join(', ') : 'N/A',
         createdAt: payment.createdAt
       }));
 
@@ -110,7 +110,32 @@ router.get('/stats', async (req, res) => {
           verified: verifiedPayments,
           rejected: rejectedPayments
         },
-        recentPayments
+        qrPaymentsList: qrPayments
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .map(payment => ({
+            id: payment._id,
+            name: payment.name,
+            email: payment.email,
+            amount: payment.amountPaid || payment.amount,
+            totalAmount: payment.totalAmount || payment.amount,
+            paymentStatus: payment.paymentStatus,
+            status: payment.status,
+            productName: payment.productDetails ? payment.productDetails.map(p => p.name || p.productName || 'Product').join(', ') : 'N/A',
+            createdAt: payment.createdAt
+          })),
+        razorpayPaymentsList: razorpayPayments
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .map(payment => ({
+            id: payment._id,
+            name: payment.name || payment.customerName || 'N/A', // Adjust based on Razorpay model
+            email: payment.email || payment.customerEmail || 'N/A',
+            amount: payment.amount,
+            totalAmount: payment.amount, // Razorpay usually full payment
+            paymentStatus: payment.paymentStatus || 'Success',
+            status: 'verified', // Razorpay are auto-verified
+            productName: payment.productDetails ? payment.productDetails.map(p => p.name || p.productName || 'Product').join(', ') : 'N/A',
+            createdAt: payment.createdAt
+          }))
       }
     });
   } catch (err) {
@@ -162,6 +187,46 @@ router.get('/payment/:id/receipt', async (req, res) => {
       success: true,
       receipt: payment.receiptImage.data,
       contentType: payment.receiptImage.contentType
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route   PUT api/admin/payment/:id/status
+// @desc    Update payment status (verified/rejected)
+// @access  Admin only
+router.put('/payment/:id/status', async (req, res) => {
+  const { status } = req.body;
+  
+  if (!['verified', 'rejected'].includes(status)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid status. Must be verified or rejected.'
+    });
+  }
+
+  try {
+    const payment = await QRPayment.findById(req.params.id);
+    
+    if (!payment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Payment not found'
+      });
+    }
+
+    payment.status = status;
+    await payment.save();
+
+    res.json({
+      success: true,
+      message: `Payment marked as ${status}`,
+      payment: {
+        id: payment._id,
+        status: payment.status
+      }
     });
   } catch (err) {
     console.error(err.message);
