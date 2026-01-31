@@ -13,13 +13,14 @@ const plansData = [
   {
     id: "regular",
     name: "Regular Plan",
-    price: 14000,
+    price: 13000,
     description: "Perfect for starters",
     color: "green",
     features: [
-      { name: "3 Social Media Setup", desc: "Insta, FB, YouTube", value: "₹3,000", color: "green" },
-      { name: "GMB Setup", desc: "Normal setup & manage", value: "₹2,500", color: "green" },
+      { name: "3 Social Media Setup", desc: "Insta, FB, YouTube", value: "₹2,000", color: "green" },
+      { name: "GMB Setup", desc: "Google My Business", value: "₹2,500", color: "green" },
       { name: "1 Ad Video (30 sec)", desc: "Full customization", value: "₹3,500", color: "green" },
+      { name: "Meta Boost", desc: "Paid advertising on Meta", value: "₹5,000", color: "green" },
     ],
     discount: "No discount applicable",
     gradient: "from-primary via-purple-500 to-pink-500",
@@ -27,50 +28,35 @@ const plansData = [
   {
     id: "premium",
     name: "Premium Plan",
-    price: 25000,
+    price: 17000,
     description: "For growing brands",
     color: "primary",
     badge: "POPULAR",
     features: [
-      { name: "Social Media Mgmt", desc: "All platforms - Full Service", value: "₹3,000", color: "primary" },
-      { name: "GMB Setup", desc: "Updates, Local SEO, Rating", value: "₹7,000", color: "primary" },
+      { name: "Social Media Mgmt", desc: "All platforms - Full Service", value: "₹2,000", color: "primary" },
+      // { name: "GMB Setup", desc: "Updates, Local SEO, Rating", value: "₹7,000", color: "primary" },
       { name: "Pack of 4 Ad Videos", desc: "Full custom. +₹2k 2nd lang", value: "₹10,000", color: "primary" },
+      { name: "Meta Boost", desc: "Paid advertising on Meta", value: "₹5,000", color: "primary" },
     ],
     discount: "Best Value for Growth",
     gradient: "from-primary via-purple-500 to-pink-500",
   },
   {
     id: "starter-combo",
-    name: "Starter Combo Plan",
-    price: 28000,
+    name: "Business Kickstart",
+    price: 27500,
     description: "Complete business starter package",
     color: "blue",
-    badge: "COMBO",
+    badge: "KICKSTART",
     features: [
-      { name: "Website", desc: "1yr hosting, domain, email, 3mo mgmt", value: "₹15,000", color: "blue" },
-      { name: "G.M.B Setup & Mgmt", desc: "Google My Business", value: "₹3,000", color: "blue" },
+      { name: "Website", desc: "1yr hosting, domain, email, 3mo mgmt", value: "₹15,000 (One Time)", color: "blue" },
+      { name: "G.M.B Setup", desc: "Google My Business", value: "₹2,500", color: "blue" },
       { name: "Double Discount", desc: "10 videos (15s) + 5 flyers", value: "₹10,000", color: "blue" },
     ],
     discount: "Save with Combo",
     gradient: "from-blue-500 via-cyan-500 to-teal-500",
   },
-  {
-    id: "pro-premium",
-    name: "Pro Premium Plan",
-    price: 37000,
-    description: "Ultimate solution",
-    color: "purple",
-    badge: "BEST VALUE",
-    features: [
-      { name: "3 Social Media Mgmt", desc: "All major platforms", value: "₹3,000", color: "purple" },
-      { name: "GMB Setup", desc: "Full suite management", value: "₹7,000", color: "purple" },
-      { name: "WhatsApp Chat Bot", desc: "24/7 automated support", value: "₹7,000", color: "purple" },
-      { name: "Pack of 4 Ad Videos", desc: "Full custom. +₹2k 2nd lang", value: "₹10,000", color: "purple" },
-      { name: "Meta & Google Boost", desc: "50% charged for maint.", value: "₹5,000", color: "purple" },
-    ],
-    discount: null,
-    gradient: "from-primary via-purple-500 to-pink-500",
-  },
+
 ];
 
 const contentPlansData = [
@@ -138,7 +124,16 @@ const contentPlansData = [
 ];
 
 const digitalFootprintPlansData = [
-
+  {
+    id: "testing-plan",
+    name: "Testing Plan",
+    price: 5,
+    description: "For testing purposes only",
+    color: "gray",
+    features: [],
+    discount: null,
+    gradient: "from-gray-500 via-gray-400 to-gray-300",
+  },
   {
     id: "insta-setup-mgmt",
     name: "Instagram Setup & Management (Monthly)",
@@ -532,14 +527,14 @@ export const BusinessPlansSection = ({ previewMode = false }: BusinessPlansSecti
                   Business Plans
                 </GradientText>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 xl:gap-6 items-stretch place-content-center">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8 items-stretch place-content-center max-w-6xl mx-auto">
                 {plansData.map((plan) => (
-                  <div key={plan.id} className={plan.badge === "COMBO" ? "relative mt-2" : ""}>
+                  <div key={plan.id} className={plan.badge === "COMBO" ? "relative overflow-hidden rounded-2xl p-[2px]" : ""}>
                     {plan.badge === "COMBO" && (
                       <>
                         {/* Premium glow effect */}
-                        <div className="absolute -inset-[2px] bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 rounded-2xl blur-sm opacity-75 animate-pulse" />
-                        <div className="absolute -inset-[1px] bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 rounded-2xl" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 rounded-2xl blur-sm opacity-75 animate-pulse" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 rounded-2xl" />
                       </>
                     )}
                     <div className={plan.badge === "COMBO" ? "relative bg-background rounded-2xl h-full" : ""}>

@@ -35,6 +35,7 @@ export default function Cart() {
   const [paymentType, setPaymentType] = useState("full"); // 'full' or 'installment'
   const [selectedReceipt, setSelectedReceipt] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   
   // Customer data form fields
   const [customerName, setCustomerName] = useState("");
@@ -43,6 +44,11 @@ export default function Cart() {
   const [formErrors, setFormErrors] = useState<{name?: string; email?: string; contact?: string; receipt?: string}>({});
   
   const { toast } = useToast();
+
+  // Scroll to top when cart page loads
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Initialize form fields when user data is available or modal opens
   useEffect(() => {
@@ -486,26 +492,34 @@ export default function Cart() {
                       <div className="flex-grow">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="text-xl font-semibold">{item.name}</h3>
-                          {item.type === 'fixed' && (
-                            <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">
-                              Fixed Plan
-                            </span>
-                          )}
                         </div>
                         <p className="text-muted-foreground text-sm mb-2">
                           Billing: <span className="capitalize">{item.billingCycle}ly</span>
                         </p>
                         {item.features && (
                           <div className="flex flex-wrap gap-2">
-                            {item.features.slice(0, 3).map((feature, idx) => (
+                            {(expandedItems.has(item.id) ? item.features : item.features.slice(0, 3)).map((feature, idx) => (
                               <span key={idx} className="text-[10px] bg-primary/10 text-primary px-2 py-1 rounded-md">
                                 {feature}
                               </span>
                             ))}
                             {item.features.length > 3 && (
-                              <span className="text-[10px] text-muted-foreground px-1 py-1">
-                                +{item.features.length - 3} more
-                              </span>
+                              <button
+                                onClick={() => {
+                                  setExpandedItems(prev => {
+                                    const newSet = new Set(prev);
+                                    if (newSet.has(item.id)) {
+                                      newSet.delete(item.id);
+                                    } else {
+                                      newSet.add(item.id);
+                                    }
+                                    return newSet;
+                                  });
+                                }}
+                                className="text-[10px] font-medium px-3 py-1 rounded-full bg-gradient-to-r from-primary/20 to-purple-500/20 text-primary border border-primary/30 hover:from-primary/30 hover:to-purple-500/30 hover:border-primary/50 hover:scale-105 active:scale-95 transition-all duration-200 shadow-sm hover:shadow-md"
+                              >
+                                {expandedItems.has(item.id) ? '↑ Show less' : `+${item.features.length - 3} more ↓`}
+                              </button>
                             )}
                           </div>
                         )}

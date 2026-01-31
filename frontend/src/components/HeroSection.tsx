@@ -13,24 +13,8 @@ export function HeroSection() {
     const video = videoRef.current;
     if (!video) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            video.play().catch((error) => console.log("Video autoplay failed:", error));
-          } else {
-            video.pause();
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(video);
-
-    return () => {
-      observer.unobserve(video);
-    };
+    // Auto-play immediately
+    video.play().catch((error) => console.log("Video autoplay failed:", error));
   }, []);
 
   const toggleMute = () => {
@@ -72,7 +56,7 @@ export function HeroSection() {
               Transform your business with cutting-edge AI automation, marketing solutions. Meet ZED, your guide to the future.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
+            <div className="hidden lg:flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
               <Button 
                 size="xl" 
                 className="group bg-white text-black hover:bg-gray-200 font-bold rounded-full" 
@@ -99,7 +83,7 @@ export function HeroSection() {
                 loop
                 muted={isMuted}
                 playsInline
-                preload="metadata"
+                preload="auto"
                 className="w-full h-full rounded-3xl object-cover shadow-2xl"
               />
               
@@ -117,6 +101,22 @@ export function HeroSection() {
                 <span className="text-sm font-medium text-foreground">Meet ZED 👋</span>
               </div>
             </div>
+          </div>
+
+          {/* Mobile Only Buttons - Below Video */}
+          <div className="flex lg:hidden flex-col sm:flex-row gap-4 justify-center pt-8 animate-fade-up">
+            <Button 
+              size="xl" 
+              className="group bg-white text-black hover:bg-gray-200 font-bold rounded-full" 
+              onClick={handleGetStarted}
+            >
+              Get Started
+              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform ml-2" />
+            </Button>
+            <Button variant="heroOutline" size="xl" className="group" onClick={handleWatchDemo}>
+              <Play className="h-5 w-5" />
+              Watch Demo
+            </Button>
           </div>
         </div>
       </div>

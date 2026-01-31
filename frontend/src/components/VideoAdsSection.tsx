@@ -14,33 +14,10 @@ const videoSlots = [
 ];
 
 // Lazy Video Component - only loads video when visible
-function LazyVideo({ videoUrl, title }: { videoUrl: string; title: string }) {
+// Video Component - loads video immediately
+function VideoItem({ videoUrl, title }: { videoUrl: string; title: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-            // Once visible, we don't need to observe anymore
-            observer.unobserve(container);
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: "100px" }
-    );
-
-    observer.observe(container);
-
-    return () => observer.disconnect();
-  }, []);
 
   const handleMouseEnter = () => {
     if (videoRef.current && isLoaded) {
@@ -57,27 +34,20 @@ function LazyVideo({ videoUrl, title }: { videoUrl: string; title: string }) {
 
   return (
     <div 
-      ref={containerRef}
       className="w-full h-full"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {isVisible ? (
-        <video
-          ref={videoRef}
-          src={videoUrl}
-          className="w-full h-full object-cover"
-          loop
-          muted
-          playsInline
-          preload="metadata"
-          onLoadedData={() => setIsLoaded(true)}
-        />
-      ) : (
-        <div className="w-full h-full bg-secondary/50 flex items-center justify-center">
-          <Play className="h-12 w-12 text-muted-foreground animate-pulse" />
-        </div>
-      )}
+      <video
+        ref={videoRef}
+        src={videoUrl}
+        className="w-full h-full object-cover"
+        loop
+        muted
+        playsInline
+        preload="auto"
+        onLoadedData={() => setIsLoaded(true)}
+      />
     </div>
   );
 }
@@ -128,7 +98,7 @@ export function VideoAdsSection() {
                   {/* Lazy-loaded Video Preview */}
                   {slot.videoUrl ? (
                     <>
-                      <LazyVideo videoUrl={slot.videoUrl} title={slot.title} />
+                      <VideoItem videoUrl={slot.videoUrl} title={slot.title} />
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-transparent transition-colors pointer-events-none">
                         <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm border border-white/50 flex items-center justify-center group-hover:scale-110 transition-transform">
                           <Play className="h-8 w-8 text-white fill-white" />
