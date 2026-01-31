@@ -20,6 +20,45 @@ const upload = multer({
     }
 });
 
+const axios = require('axios');
+
+// Google Sheet Web App URL
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxFqO7XzYR1GmlP08wvsBUbXrb1n8cv7VwYTdlTYvssd5ww4YbAFbjPLujDzlS1bVm6ww/exec';
+
+// Helper function to send data to Google Sheet
+const sendToGoogleSheet = async (data) => {
+    try {
+        console.log("=== GOOGLE SHEET UPDATE ===");
+        console.log("Sending data:", JSON.stringify(data, null, 2));
+        
+        const response = await axios.post(GOOGLE_SHEET_URL, data, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            timeout: 10000 // 10 second timeout
+        }); 
+        
+        console.log("Response Status:", response.status);
+        console.log("Response Data:", response.data);
+        
+        // Google often returns 200 OK with an HTML login page if permissions are wrong
+        if (typeof response.data === 'string' && response.data.trim().startsWith('<')) {
+            console.error("❌ Failed to update Google Sheet: Received HTML response (likely permission/auth error).");
+            console.error("Ensure the Google Apps Script is deployed as 'Web App', Execute as: 'Me', Who has access: 'Anyone'.");
+            return;
+        }
+
+        console.log("✅ Google Sheet updated successfully.");
+        console.log("===========================");
+    } catch (error) {
+        console.error("❌ Failed to update Google Sheet:", error.message);
+        if (error.response) {
+            console.error("Error Response:", error.response.status, error.response.data);
+        }
+        console.log("===========================");
+    }
+};
+
 // @route   POST api/payment/save
 // @desc    Save payment details
 // @access  Public (or Private depending on needs, currently handling basic save)
@@ -108,6 +147,19 @@ router.post('/save', async (req, res) => {
             }
         });
     }
+    
+    // --- SEND TO GOOGLE SHEET ---
+    const sheetData = {
+        productName: productDetails.map(p => p.name || p.productName || 'Product').join(', '),
+        paymentMode: 'Razorpay',
+        paymentStatus: paymentStatusLabel,
+        userName: name,
+        userEmail: email
+    };
+    
+    // Send asynchronously without awaiting to avoid blocking response
+    sendToGoogleSheet(sheetData);
+    // ---------------------------
 
     res.json({ ...savedPayment.toObject(), invoiceId: savedInvoice._id, invoiceNumber: savedInvoice.invoiceNumber });
   } catch (err) {
@@ -173,6 +225,8 @@ router.post('/qr-payment', upload.single('receiptImage'), async (req, res) => {
       paymentStatus = 'Full Payment';
     }
 
+    const products = JSON.parse(productDetails);
+
     const newQRPayment = new QRPayment({
       name,
       mobileNumber,
@@ -180,7 +234,7 @@ router.post('/qr-payment', upload.single('receiptImage'), async (req, res) => {
       amount: amountPaid, // Keep for backward compatibility
       totalAmount: totalAmount,
       amountPaid: amountPaid,
-      productDetails: JSON.parse(productDetails), // Parse JSON string
+      productDetails: products, // Parse JSON string
       receiptImage: {
         data: receiptImageBase64,
         contentType: req.file.mimetype
@@ -199,7 +253,7 @@ router.post('/qr-payment', upload.single('receiptImage'), async (req, res) => {
                 amount: parseFloat(amount),
                 isPending: true,
                 originalPaymentId: savedQRPayment._id.toString(),
-                productDetails: JSON.parse(productDetails)
+                productDetails: products
             }
         });
     } else if (paymentType === 'clearance') {
@@ -236,7 +290,7 @@ router.post('/qr-payment', upload.single('receiptImage'), async (req, res) => {
         customerName: name,
         customerEmail: email,
         customerPhone: mobileNumber,
-        productDetails: JSON.parse(productDetails).map(p => ({
+        productDetails: products.map(p => ({
             name: p.name || p.productName || 'Product',
             price: p.price || 0,
             billingCycle: p.billingCycle || 'one-time'
@@ -249,6 +303,19 @@ router.post('/qr-payment', upload.single('receiptImage'), async (req, res) => {
     });
 
     const savedInvoice = await newInvoice.save();
+
+    // --- SEND TO GOOGLE SHEET ---
+    const sheetData = {
+        productName: products.map(p => p.name || p.productName || 'Product').join(', '),
+        paymentMode: 'QR Code',
+        paymentStatus: invoicePaymentStatus,
+        userName: name,
+        userEmail: email
+    };
+    
+    // Send asynchronously 
+    sendToGoogleSheet(sheetData);
+    // ---------------------------
 
     res.json({
       success: true,

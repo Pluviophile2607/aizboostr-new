@@ -9,6 +9,9 @@ const checkDb = async () => {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB');
 
+    const QRPayment = require('./models/QRPayment');
+    const Payment = require('./models/Payment');
+
     const users = await User.find({});
     console.log('--- Registered Users ---');
     if (users.length === 0) {
@@ -23,6 +26,12 @@ const checkDb = async () => {
             console.log('------------------------');
         });
     }
+
+    const qrPayments = await QRPayment.countDocuments();
+    const razorpayPayments = await Payment.countDocuments();
+    console.log(`\n--- Payment Stats ---`);
+    console.log(`QR Payments: ${qrPayments}`);
+    console.log(`Razorpay Payments: ${razorpayPayments}`);
 
     mongoose.disconnect();
   } catch (error) {
