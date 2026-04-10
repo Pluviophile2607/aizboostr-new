@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://aizboostr-new-production.up.railway.app',
+  baseURL: import.meta.env.VITE_API_URL || 'https://aizboostr-new.onrender.com/api',
 });
 
 // Add a request interceptor to attach the token

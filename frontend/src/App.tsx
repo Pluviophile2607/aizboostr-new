@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CompleteProfileModal } from "./components/CompleteProfileModal";
-import { FloatingWhatsAppButton } from "./components/FloatingWhatsAppButton";
+import { FloatingCallButton } from "./components/FloatingCallButton";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CartProvider } from "@/context/CartContext";
@@ -19,7 +19,7 @@ import Cart from "./pages/Cart";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import InvoicePage from "./pages/InvoicePage";
-import NotFound from "./pages/NotFound";
+import NotFound from "./pages/404-page/NotFound";
 import IntroVideo from "./components/IntroVideo";
 
 const queryClient = new QueryClient();
@@ -50,13 +50,12 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <FloatingWhatsAppButton />
+              <FloatingCallButton />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/service/:slug" element={<ServicePage />} />
                 <Route path="/custom-packages" element={<CustomPackages />} />
-                <Route path="/video-ads" element={<VideoAds />} />
                 <Route path="/video-ads" element={<VideoAds />} />
                 <Route path="/business-plans" element={<BusinessPlans />} />
                 <Route path="/cart" element={<Cart />} />

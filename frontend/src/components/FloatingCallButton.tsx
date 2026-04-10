@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom";
 export const FloatingCallButton = () => {
   const [isHovered, setIsHovered] = useState(false);
   const location = useLocation();
-  const phoneNumber = "+919892489040";
+  const phoneNumber = "+919136285358";
 
   // Hide button on auth and admin pages
   if (location.pathname === "/auth" || location.pathname.startsWith("/admin")) {
